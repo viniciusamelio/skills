@@ -10,6 +10,7 @@
   "keywords": ["engineering", "skills", "kaizen", "rfc", "pull-requests"],
   "skills": [
     "./skills/kaizen",
+    "./skills/modular-thinking",
     "./skills/pr-runtime-evidence",
     "./skills/rfc"
   ]

@@ -66,6 +66,7 @@ Don't combine local links with a plugin install in the same agent.
 ## Skills
 
 - **[kaizen](./skills/kaizen/SKILL.md)**: Identify, propose, or implement small continuous improvements using mistake prevention, YAGNI, explicit error values, and incremental refactoring.
+- **[modular-thinking](./skills/modular-thinking/SKILL.md)**: Analyze a feature or the whole project through DDD bounded contexts and vertical slices, recommend where new work belongs, or run a test-protected migration toward that structure.
 - **[pr-runtime-evidence](./skills/pr-runtime-evidence/SKILL.md)**: Investigate stored crashes and logs related to code planned for or changed in a PR, connecting them to scoped prevention and regression coverage.
 - **[rfc](./skills/rfc/SKILL.md)**: Draft or revise a PR-scoped RFC, ready for the Issue and pull request descriptions.
 

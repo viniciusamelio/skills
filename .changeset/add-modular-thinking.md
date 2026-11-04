@@ -1,0 +1,5 @@
+---
+"viniciusamelio-skills": minor
+---
+
+Add `modular-thinking`, a skill that analyzes a feature or a whole project through DDD bounded contexts and vertical slices. It recommends where new work belongs within the existing architecture, and only restructures code when asked to migrate, protecting every step with migrated, characterization, or test-first tests.
