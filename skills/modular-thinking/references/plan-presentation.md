@@ -40,7 +40,7 @@ Separate verified facts from inferences everywhere: an inferred context or bound
 
 ## Visual language
 
-The template follows a monochrome interface: hierarchy comes from stepped surface tones, type weight, and size. Keep it that way.
+The template follows a monochrome interface: hierarchy comes from stepped surface tones, type weight, and size, inside hairline panels with nearly square corners (2 to 4px). Each panel has a header with its label and an interaction hint, and a dashed footer with the caption and live metadata. Keep it that way.
 
 - **Surfaces**: the page background is the darkest (or lightest) tone; sections sit on `surface-1`, content inside them on `surface-2`, and emphasis on `surface-3` and `surface-4`. Separate elements by tone and spacing, not by borders.
 - **Type**: large, tight display headings for sections; small uppercase labels for metadata; body text in a muted tone, with the most important sentence (the reason for a change) in the brightest tone.
@@ -50,8 +50,18 @@ The template follows a monochrome interface: hierarchy comes from stepped surfac
   - move `→`: dashed border
   - remove `−`: dotted border, faded and struck through
   - keep `·`: lowest surface, muted text
-- **Labels** are the one accent: blue, uppercase monospace with wide tracking, wrapped in brackets (`[ HYPOTHESIS ]`). Use the template's label classes (`eyebrow`, `kicker`, table headers, `hypothesis`) for every label, such as section kickers, source and risk headings, and hypotheses. The CSS adds the brackets; write only the word.
-- Do not use the accent anywhere else, and do not add other colors, gradients, shadows, or fonts.
+- **Labels and interaction state** are the one accent: blue, uppercase monospace with wide tracking, wrapped in brackets (`[ HYPOTHESIS ]`). Use the template's label classes (`eyebrow`, `kicker`, table headers, `hypothesis`) for every label, such as section kickers, source and risk headings, and hypotheses. The CSS adds the brackets; write only the word.
+- The accent also marks interaction state: traced elements, the active filter, focus, and review progress. Do not use it anywhere else, and do not add other colors, gradients, shadows, or fonts.
+
+## Interactions
+
+The template wires these interactions; the page only needs consistent markup:
+
+- **Tracing**: hovering a diagram node, a file row, or a change card highlights everything that shares one of its ref tokens and dims the rest. A Mermaid node's token is its id (`B` in `B["Billing"]`). Give each change card and file row a `data-refs` attribute listing the node ids and any extra tokens that connect them, so every change is reachable from its diagram nodes and files. Clicking a node or a row opens the first change card that shares a token.
+- **Filter**: the legend chips filter every diagram, row, and card by change kind.
+- **Review**: each change card gets ok and adjust controls with a note, saved in the browser. The review bar shows progress and copies a plain-text review the user can paste back into the conversation. Tell the user about it when you share the page, and treat a pasted review as their answer: apply the adjustments, regenerate the page, and ask again.
+- **Navigation**: a contents list with scroll tracking, expandable diagram panels, click-to-copy on code and paths, and `j`/`k`/`Esc` shortcuts.
+- Translate the strings in the `ui-text` block with the rest of the page.
 
 ## Diagrams
 

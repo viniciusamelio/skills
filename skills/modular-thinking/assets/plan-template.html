@@ -3,20 +3,23 @@
   Plan presentation template for the modular-thinking skill.
   Copy it to the OS temp directory, replace every {{PLACEHOLDER}}, repeat the
   marked blocks as needed, and delete blocks that do not apply. Keep the file
-  self-contained: inline styles, no local assets.
+  self-contained: inline styles and scripts, no local assets.
 
-  Visual language: monochrome. Hierarchy comes from stepped surface tones,
-  type weight, and size. The one accent is blue, reserved for labels
-  (eyebrow, kickers, table headers, hypotheses), set in uppercase monospace
-  inside brackets that the CSS adds. Change kinds are told apart by tone,
-  line style, and a glyph:
-    add     solid light fill, like a primary button     +
-    change  raised surface with a light border          ~
-    move    dashed border                                →
-    remove  dotted border, struck-through, faded         −
-    keep    lowest surface, muted text                   ·
+  Visual language: monochrome surfaces with stepped tones, hairline panels,
+  and nearly square corners. The one accent is blue: labels (uppercase
+  monospace in brackets that the CSS adds) and interaction state.
+  Change kinds are told apart by tone, line style, and a glyph:
+    add + · change ~ · move → · remove − · keep ·
   In Mermaid, mark nodes with :::add, :::change, :::move, :::remove, or
   :::keep. The page styles them; do not add classDef or style lines.
+
+  Tracing: give related things the same ref tokens so hovering one
+  highlights the others. A Mermaid node's token is its id (B in B["Billing"]).
+  Use data-refs="B S3" on change cards and tree rows. Clicking a node or a
+  tree row scrolls to the first change card that shares a token.
+
+  Interactive text (hints, buttons, the copied review) lives in the
+  ui-text JSON block near the end. Translate it with the rest of the page.
 -->
 <html lang="{{LANG}}">
 <head>
@@ -34,7 +37,9 @@
     --surface-2: #1a1a1e;
     --surface-3: #232327;
     --surface-4: #2c2c31;
+    --hairline: #222227;
     --line: #34343a;
+    --dot: #232328;
     --fg: #fafafa;
     --fg-2: #d4d4d8;
     --muted: #9a9aa1;
@@ -42,6 +47,10 @@
     --solid: #fafafa;
     --on-solid: #0b0b0e;
     --accent: #2b8cff;
+    --accent-soft: rgba(43, 140, 255, .14);
+    --r: 4px;
+    --r-sm: 3px;
+    --r-xs: 2px;
     --display: "Work Sans", system-ui, sans-serif;
     --text: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
     --mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
@@ -54,7 +63,9 @@
       --surface-2: #e9e9ec;
       --surface-3: #dfdfe3;
       --surface-4: #d4d4d9;
+      --hairline: #e0e0e4;
       --line: #c4c4ca;
+      --dot: #d6d6db;
       --fg: #0b0b0e;
       --fg-2: #2c2c31;
       --muted: #5f5f66;
@@ -62,107 +73,177 @@
       --solid: #0b0b0e;
       --on-solid: #fafafa;
       --accent: #0a66d1;
+      --accent-soft: rgba(10, 102, 209, .12);
     }
   }
   * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; scroll-padding-top: 32px; }
   body { margin: 0; background: var(--bg); color: var(--fg-2); font: 15px/1.6 var(--text); -webkit-font-smoothing: antialiased; }
-  main { max-width: 1160px; margin: 0 auto; padding: 72px 32px 96px; }
   a { color: var(--fg); text-underline-offset: 3px; text-decoration-color: var(--faint); }
-  code { font: 13px var(--mono); color: var(--fg); background: var(--surface-3); padding: 2px 7px; border-radius: 6px; }
+  a:hover { text-decoration-color: var(--accent); }
+  code { font: 13px var(--mono); color: var(--fg); background: var(--surface-3); padding: 2px 6px; border-radius: var(--r-xs); cursor: copy; transition: background .15s, color .15s; }
+  code:hover { background: var(--accent-soft); color: var(--accent); }
+  button { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; }
+  :focus-visible { outline: 1px solid var(--accent); outline-offset: 2px; }
 
-  /* Labels: the only accent. Uppercase monospace in brackets. */
+  .layout { display: grid; grid-template-columns: 200px minmax(0, 1fr); gap: 48px; max-width: 1320px; margin: 0 auto; padding: 72px 32px 160px; }
+  @media (max-width: 1100px) { .layout { grid-template-columns: minmax(0, 1fr); } .toc { display: none; } }
+  main { min-width: 0; counter-reset: section; }
+
+  /* Labels and tools: the accent, uppercase monospace in brackets. */
   .eyebrow, .kicker, th, .hypothesis { font: 400 12px/1.2 var(--mono); letter-spacing: .14em; text-transform: uppercase; color: var(--accent); }
-  .eyebrow::before, .kicker::before, th:not(:empty)::before, .hypothesis::before { content: "[ "; }
-  .eyebrow::after, .kicker::after, th:not(:empty)::after, .hypothesis::after { content: " ]"; }
+  .eyebrow::before, .kicker::before, th:not(:empty)::before, .hypothesis::before, .tool::before { content: "[ "; }
+  .eyebrow::after, .kicker::after, th:not(:empty)::after, .hypothesis::after, .tool::after { content: " ]"; }
   .eyebrow { margin: 0 0 18px; }
+  .kicker { margin: 0; }
+  .hint { font: 400 11px/1.2 var(--mono); letter-spacing: .05em; color: var(--faint); }
+  .tool { font: 400 11px/1 var(--mono); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); padding: 6px 2px; transition: color .15s; }
+  .tool:hover, .tool[aria-pressed="true"] { color: var(--accent); }
+
+  /* Table of contents. */
+  .toc { position: sticky; top: 32px; align-self: start; }
+  .toc ol { list-style: none; margin: 14px 0 0; padding: 0; display: grid; gap: 2px; }
+  .toc a { display: grid; grid-template-columns: 26px 1fr; padding: 6px 8px; border-radius: var(--r-xs); font: 400 12px/1.4 var(--mono); color: var(--faint); text-decoration: none; transition: color .15s, background .15s; }
+  .toc a:hover { color: var(--fg-2); background: var(--surface-1); }
+  .toc a.is-active { color: var(--fg); background: var(--surface-2); }
+  .toc a.is-active span:first-child { color: var(--accent); }
+
   h1 { font: 800 clamp(40px, 6vw, 72px)/1.02 var(--display); letter-spacing: -.045em; color: var(--fg); margin: 0 0 24px; max-width: 16ch; }
-  h2 { font: 700 34px/1.1 var(--display); letter-spacing: -.035em; color: var(--fg); margin: 88px 0 8px; }
-  h2 + .lede { margin-top: 0; }
-  h3 { font: 600 18px/1.3 var(--display); letter-spacing: -.01em; color: var(--fg); margin: 0 0 6px; }
+  h2 { counter-increment: section; font: 700 34px/1.1 var(--display); letter-spacing: -.035em; color: var(--fg); margin: 96px 0 8px; display: flex; align-items: baseline; gap: 16px; }
+  h2::before { content: counter(section, decimal-leading-zero); font: 400 13px var(--mono); letter-spacing: .1em; color: var(--faint); }
+  h3 { font: 600 18px/1.3 var(--display); letter-spacing: -.01em; color: var(--fg); margin: 0; }
   .lede { color: var(--muted); font-size: 16px; max-width: 70ch; margin: 0 0 24px; }
   p, li { max-width: 76ch; }
 
   .pills { display: flex; flex-wrap: wrap; gap: 8px; }
-  .pill { display: inline-flex; align-items: center; gap: 8px; height: 34px; padding: 0 16px; border-radius: 999px; background: var(--surface-2); color: var(--fg-2); font: 500 13px var(--text); }
-  .pill.solid { background: var(--solid); color: var(--on-solid); font-weight: 600; }
+  .pill { display: inline-flex; align-items: center; height: 32px; padding: 0 14px; border-radius: var(--r-sm); background: var(--surface-2); color: var(--fg-2); font: 400 12px var(--mono); letter-spacing: .04em; }
+  .pill.solid { background: var(--solid); color: var(--on-solid); font-weight: 500; }
 
-  .surface { background: var(--surface-1); border-radius: 32px; padding: 32px; }
-  .inset { background: var(--surface-2); border-radius: 18px; padding: 20px 22px; }
-  .summary { font-size: 19px; line-height: 1.55; color: var(--fg); margin: 48px 0 0; }
-  .summary p { margin: 0; max-width: 64ch; }
+  /* Panels: hairline frame, header with label and hint, dashed footer with live meta. */
+  .panel { position: relative; background: var(--surface-1); border: 1px solid var(--hairline); border-radius: var(--r); padding: 22px 24px 18px; transition: border-color .2s; }
+  .panel:hover { border-color: var(--line); }
+  .panel-head { display: flex; align-items: center; gap: 16px; margin: 0 0 18px; }
+  .panel-head .hint { margin-left: auto; text-align: right; }
+  .panel-foot { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 24px; margin-top: 18px; padding-top: 14px; border-top: 1px dashed var(--line); font: 400 12px/1.5 var(--mono); }
+  .panel-foot .caption { color: var(--fg-2); font: 14px/1.5 var(--text); }
+  .panel-foot .meta { margin-left: auto; color: var(--faint); letter-spacing: .04em; white-space: nowrap; }
+  .panel-foot .meta b { color: var(--accent); font-weight: 400; }
+  .inset { background: var(--surface-2); border-radius: var(--r-sm); padding: 18px 20px; }
+  .canvas { background-color: var(--surface-2); background-image: radial-gradient(var(--dot) 1px, transparent 1.2px); background-size: 14px 14px; border-radius: var(--r-sm); padding: 28px 16px; overflow-x: auto; }
+  .stack { display: grid; gap: 12px; }
 
-  .legend { display: flex; flex-wrap: wrap; gap: 8px; margin: 20px 0 0; }
-  .chip { display: inline-flex; align-items: center; gap: 8px; height: 30px; padding: 0 14px 0 10px; border-radius: 999px; font: 500 13px var(--text); color: var(--fg-2); background: var(--surface-1); }
-  .glyph { display: inline-grid; place-items: center; width: 20px; height: 20px; border-radius: 6px; font: 600 12px/1 var(--mono); }
+  .panel.is-expanded { position: fixed; inset: 20px; z-index: 40; overflow: auto; border-color: var(--line); box-shadow: 0 0 0 100vmax rgba(0, 0, 0, .6); }
+  .panel.is-expanded .canvas { min-height: calc(100% - 120px); display: grid; place-items: center; }
+  .panel.is-expanded .mermaid svg { transform: scale(1.35); transform-origin: center; margin: 12% 0; }
+
+  .summary { margin: 48px 0 0; }
+  .summary p:not(.kicker) { margin: 14px 0 0; font-size: 19px; line-height: 1.55; color: var(--fg); max-width: 64ch; }
+
+  /* Legend doubles as a filter. */
+  .legend { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin: 16px 0 0; }
+  .legend .hint { margin-left: 8px; }
+  .chip { display: inline-flex; align-items: center; gap: 8px; height: 30px; padding: 0 12px 0 8px; border-radius: var(--r-sm); font: 500 13px var(--text); color: var(--fg-2); background: var(--surface-1); border: 1px solid transparent; transition: border-color .15s, color .15s, opacity .15s; }
+  button.chip:hover { border-color: var(--line); }
+  button.chip[aria-pressed="true"] { border-color: var(--accent); color: var(--fg); }
+  body.has-kind button.chip[aria-pressed="false"] { opacity: .45; }
+  .glyph { display: inline-grid; place-items: center; width: 18px; height: 18px; border-radius: var(--r-xs); font: 500 11px/1 var(--mono); flex: none; }
   .k-add .glyph { background: var(--solid); color: var(--on-solid); }
-  .k-change .glyph { background: var(--surface-4); color: var(--fg); box-shadow: inset 0 0 0 1.5px var(--fg-2); }
-  .k-move .glyph { background: var(--surface-3); color: var(--fg); outline: 1.5px dashed var(--fg-2); outline-offset: -1.5px; }
-  .k-remove .glyph { color: var(--muted); outline: 1.5px dotted var(--faint); outline-offset: -1.5px; }
+  .k-change .glyph { background: var(--surface-4); color: var(--fg); box-shadow: inset 0 0 0 1px var(--fg-2); }
+  .k-move .glyph { background: var(--surface-3); color: var(--fg); outline: 1px dashed var(--fg-2); outline-offset: -1px; }
+  .k-remove .glyph { color: var(--muted); outline: 1px dotted var(--faint); outline-offset: -1px; }
   .k-keep .glyph { background: var(--surface-2); color: var(--faint); }
 
-  .stack { display: grid; gap: 12px; }
   figure { margin: 0; }
-  .diagram { background: var(--surface-1); border-radius: 32px; padding: 28px 28px 22px; }
-  .diagram .kicker { margin: 0 0 18px; }
-  .canvas { background: var(--surface-2); border-radius: 18px; padding: 28px 16px; overflow-x: auto; }
   .mermaid { margin: 0; text-align: center; font: 13px var(--mono); color: var(--muted); white-space: pre; }
   .mermaid[data-processed] { white-space: normal; }
-  figcaption { color: var(--muted); font-size: 14px; margin: 14px 4px 0; }
 
   .tree { list-style: none; margin: 0; padding: 0; font: 13.5px/1 var(--mono); }
-  .tree li { display: flex; align-items: center; gap: 12px; min-height: 36px; padding: 0 12px; border-radius: 10px; max-width: none; }
+  .tree li { display: flex; align-items: center; gap: 12px; min-height: 34px; padding: 0 12px; border-radius: var(--r-xs); border: 1px solid transparent; max-width: none; }
   .tree li + li { margin-top: 2px; }
+  .tree li[data-refs]:not([data-refs=""]) { cursor: pointer; }
   .tree .path { white-space: pre; }
   .tree .note { margin-left: auto; font: 13px var(--text); color: var(--muted); }
   .tree .k-add { background: var(--surface-3); color: var(--fg); font-weight: 500; }
-  .tree .k-change { background: var(--surface-2); color: var(--fg); }
+  .tree .k-change { background: var(--surface-1); color: var(--fg); }
   .tree .k-move { color: var(--fg-2); }
   .tree .k-remove { color: var(--faint); }
   .tree .k-remove .path { text-decoration: line-through; text-decoration-color: var(--faint); }
   .tree .k-keep { color: var(--faint); }
 
   .changes { display: grid; gap: 12px; }
-  .change { background: var(--surface-1); border-radius: 32px; padding: 32px; display: grid; gap: 20px; }
-  .change-head { display: flex; align-items: center; gap: 12px; }
+  .change { display: grid; gap: 16px; scroll-margin-top: 32px; }
+  .change .panel-head { margin: 0; }
   .change-head .chip { background: var(--surface-3); }
-  .change-head h3 { margin: 0; font-size: 22px; letter-spacing: -.02em; }
+  .change-head h3 { font-size: 21px; letter-spacing: -.02em; }
   .what { color: var(--fg-2); margin: 0; }
-  .why { background: var(--surface-2); border-radius: 18px; padding: 20px 22px; }
-  .why p:not(.kicker) { margin: 0; color: var(--fg); font-size: 17px; line-height: 1.55; }
-  .sources { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 12px; }
-  .sources ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
-  .sources li { color: var(--fg-2); }
-  .facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; }
-  .facts p:not(.kicker) { margin: 0; }
-  .kicker { margin: 0 0 12px; }
+  .why p:not(.kicker) { margin: 12px 0 0; color: var(--fg); font-size: 17px; line-height: 1.55; }
+  .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 12px; }
+  .grid-2 ul { list-style: none; margin: 12px 0 0; padding: 0; display: grid; gap: 10px; }
+  .grid-2 p:not(.kicker) { margin: 12px 0 0; }
 
-  table { width: 100%; border-collapse: separate; border-spacing: 0 4px; font-size: 14px; }
-  th { text-align: left; padding: 0 16px 8px; white-space: nowrap; }
-  td { background: var(--surface-2); padding: 14px 16px; vertical-align: top; color: var(--fg-2); }
-  td:first-child { border-radius: 12px 0 0 12px; }
-  td:last-child { border-radius: 0 12px 12px 0; }
+  /* Review controls, injected per change. */
+  .review { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 16px; padding-top: 14px; border-top: 1px dashed var(--line); }
+  .review .state { margin-left: auto; font: 400 11px var(--mono); letter-spacing: .14em; text-transform: uppercase; color: var(--faint); }
+  .review textarea { flex: 1 0 100%; min-height: 72px; margin-top: 8px; resize: vertical; background: var(--surface-2); color: var(--fg); border: 1px solid var(--line); border-radius: var(--r-xs); padding: 10px 12px; font: 14px/1.5 var(--text); }
+  .review textarea:focus { outline: none; border-color: var(--accent); }
+  .change[data-review="ok"] .review .state, .change[data-review="adjust"] .review .state { color: var(--accent); }
+  .change[data-review="ok"] { border-color: var(--line); }
 
-  .list { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
-  .list li { background: var(--surface-1); border-radius: 18px; padding: 18px 22px; max-width: none; }
+  table { width: 100%; border-collapse: separate; border-spacing: 0 3px; font-size: 14px; }
+  th { text-align: left; padding: 0 14px 8px; white-space: nowrap; }
+  td { background: var(--surface-2); padding: 12px 14px; vertical-align: top; color: var(--fg-2); }
+  td:first-child { border-radius: var(--r-xs) 0 0 var(--r-xs); }
+  td:last-child { border-radius: 0 var(--r-xs) var(--r-xs) 0; }
+
+  .list { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+  .list li { background: var(--surface-1); border: 1px solid var(--hairline); border-radius: var(--r); padding: 16px 20px; max-width: none; }
   .hypothesis { display: inline-block; margin-right: 12px; }
 
-  /* Mermaid: monochrome node treatments by change kind. */
-  .mermaid svg { max-width: 100%; height: auto; }
-  .mermaid .node rect, .mermaid .node polygon, .mermaid .node circle, .mermaid .node path { rx: 12px; ry: 12px; }
+  /* Tracing and filtering. */
+  .trace { transition: opacity .18s, border-color .18s, background-color .18s; }
+  body.is-tracing .trace:not(.is-hit), body.has-kind .trace.is-off { opacity: .22; }
+  .tree li.is-hit, .change.is-hit { border-color: var(--accent); }
+  .change.is-flash { animation: flash 1.2s ease-out; }
+  @keyframes flash { 0% { box-shadow: 0 0 0 1px var(--accent), 0 0 0 6px var(--accent-soft); } 100% { box-shadow: 0 0 0 1px transparent, 0 0 0 6px transparent; } }
+
+  /* Review bar and toast. */
+  .reviewbar { position: fixed; left: 50%; bottom: 20px; transform: translateX(-50%); z-index: 30; display: flex; align-items: center; gap: 20px; padding: 10px 12px 10px 18px; background: var(--surface-2); border: 1px solid var(--line); border-radius: var(--r); font: 400 12px var(--mono); letter-spacing: .04em; color: var(--muted); box-shadow: 0 12px 40px rgba(0, 0, 0, .35); white-space: nowrap; }
+  .reviewbar b { color: var(--fg); font-weight: 500; }
+  .reviewbar .bar { width: 120px; height: 2px; background: var(--surface-4); border-radius: 1px; overflow: hidden; }
+  .reviewbar .bar i { display: block; height: 100%; width: 0; background: var(--accent); transition: width .25s; }
+  .reviewbar .copy { height: 32px; padding: 0 14px; border-radius: var(--r-xs); background: var(--solid); color: var(--on-solid); font: 500 11px var(--mono); letter-spacing: .14em; text-transform: uppercase; }
+  .reviewbar .copy::before { content: "[ "; } .reviewbar .copy::after { content: " ]"; }
+  .reviewbar .keys { color: var(--faint); }
+  @media (max-width: 760px) { .reviewbar .keys, .reviewbar .bar { display: none; } }
+  .toast { position: fixed; left: 50%; bottom: 76px; transform: translate(-50%, 8px); z-index: 50; padding: 8px 14px; background: var(--solid); color: var(--on-solid); border-radius: var(--r-xs); font: 500 11px var(--mono); letter-spacing: .14em; text-transform: uppercase; opacity: 0; pointer-events: none; transition: opacity .2s, transform .2s; }
+  .toast.is-on { opacity: 1; transform: translate(-50%, 0); }
+
+  /* Mermaid: monochrome node treatments by change kind, accent on trace. */
+  .mermaid svg { max-width: 100%; height: auto; overflow: visible; }
+  .mermaid .node rect, .mermaid .node polygon { rx: 3px; ry: 3px; }
+  .mermaid g.node { cursor: pointer; }
   .mermaid .node.add rect, .mermaid .node.add polygon, .mermaid .node.add path { fill: var(--solid) !important; stroke: var(--solid) !important; }
   .mermaid .node.add .nodeLabel, .mermaid .node.add span, .mermaid .node.add p { color: var(--on-solid) !important; fill: var(--on-solid) !important; font-weight: 600; }
   .mermaid .node.change rect, .mermaid .node.change polygon, .mermaid .node.change path { fill: var(--surface-4) !important; stroke: var(--fg-2) !important; stroke-width: 1.5px !important; }
   .mermaid .node.move rect, .mermaid .node.move polygon, .mermaid .node.move path { fill: var(--surface-3) !important; stroke: var(--fg-2) !important; stroke-width: 1.5px !important; stroke-dasharray: 6 4; }
-  .mermaid .node.remove rect, .mermaid .node.remove polygon, .mermaid .node.remove path { fill: transparent !important; stroke: var(--faint) !important; stroke-width: 1.5px !important; stroke-dasharray: 2 4; }
+  .mermaid .node.remove rect, .mermaid .node.remove polygon, .mermaid .node.remove path { fill: var(--surface-2) !important; stroke: var(--faint) !important; stroke-width: 1.5px !important; stroke-dasharray: 2 4; }
   .mermaid .node.remove .nodeLabel, .mermaid .node.remove span, .mermaid .node.remove p { color: var(--faint) !important; text-decoration: line-through; }
   .mermaid .node.keep rect, .mermaid .node.keep polygon, .mermaid .node.keep path { fill: var(--surface-2) !important; stroke: var(--line) !important; }
   .mermaid .node.keep .nodeLabel, .mermaid .node.keep span, .mermaid .node.keep p { color: var(--muted) !important; }
-  .mermaid .edgeLabel, .mermaid .edgeLabel p, .mermaid .edgeLabel span { color: var(--muted) !important; font-size: 12.5px; }
-  .mermaid .cluster rect { rx: 18px; ry: 18px; }
-  .mermaid rect.actor { rx: 12px; ry: 12px; }
+  .mermaid g.node.is-hit rect, .mermaid g.node.is-hit polygon { stroke: var(--accent) !important; stroke-width: 2px !important; }
+  .mermaid .edgeLabel, .mermaid .edgeLabel p, .mermaid .edgeLabel span { color: var(--muted) !important; font: 12px var(--mono) !important; letter-spacing: .02em; }
+  .mermaid rect.actor { rx: 3px; ry: 3px; }
+  .mermaid .cluster rect { rx: 4px; ry: 4px; }
 </style>
 </head>
 <body>
+<div class="layout">
+
+<nav class="toc">
+  <p class="kicker" data-ui="toc"></p>
+  <ol></ol>
+</nav>
+
 <main>
 
 <header>
@@ -176,90 +257,96 @@
   </div>
 </header>
 
-<section class="surface summary">
+<section class="panel summary">
   <p class="kicker">{{LABEL_SUMMARY}}</p>
   <p>{{ONE_PARAGRAPH_SUMMARY: what changes, why, and what stays the same}}</p>
 </section>
 
 <div class="legend">
-  <span class="chip k-add"><span class="glyph">+</span>{{LEGEND_ADD}}</span>
-  <span class="chip k-change"><span class="glyph">~</span>{{LEGEND_CHANGE}}</span>
-  <span class="chip k-move"><span class="glyph">→</span>{{LEGEND_MOVE}}</span>
-  <span class="chip k-remove"><span class="glyph">−</span>{{LEGEND_REMOVE}}</span>
-  <span class="chip k-keep"><span class="glyph">·</span>{{LEGEND_KEEP}}</span>
+  <button class="chip k-add" data-kind="add"><span class="glyph">+</span>{{LEGEND_ADD}}</button>
+  <button class="chip k-change" data-kind="change"><span class="glyph">~</span>{{LEGEND_CHANGE}}</button>
+  <button class="chip k-move" data-kind="move"><span class="glyph">→</span>{{LEGEND_MOVE}}</button>
+  <button class="chip k-remove" data-kind="remove"><span class="glyph">−</span>{{LEGEND_REMOVE}}</button>
+  <button class="chip k-keep" data-kind="keep"><span class="glyph">·</span>{{LEGEND_KEEP}}</button>
+  <span class="hint" data-ui="legendHint"></span>
 </div>
 
 <h2>{{SECTION_CONTEXT_MAP}}</h2>
 <p class="lede">{{LEDE_CONTEXT_MAP}}</p>
 <div class="stack">
-  <figure class="diagram">
-    <p class="kicker">{{LABEL_CURRENT}}</p>
+  <figure class="panel">
+    <div class="panel-head"><p class="kicker">{{LABEL_CURRENT}}</p></div>
     <div class="canvas"><pre class="mermaid">
 flowchart LR
   %% Current contexts. Label each edge with its pattern and direction.
   {{CURRENT_CONTEXT_MAP}}
     </pre></div>
-    <figcaption>{{CAPTION_CURRENT}}</figcaption>
+    <figcaption class="panel-foot"><span class="caption">{{CAPTION_CURRENT}}</span></figcaption>
   </figure>
-  <figure class="diagram">
-    <p class="kicker">{{LABEL_TARGET}}</p>
+  <figure class="panel">
+    <div class="panel-head"><p class="kicker">{{LABEL_TARGET}}</p></div>
     <div class="canvas"><pre class="mermaid">
 flowchart LR
   %% Target contexts. Mark nodes with :::add, :::change, :::move, :::remove, :::keep.
   {{TARGET_CONTEXT_MAP}}
     </pre></div>
-    <figcaption>{{CAPTION_TARGET}}</figcaption>
+    <figcaption class="panel-foot"><span class="caption">{{CAPTION_TARGET}}</span></figcaption>
   </figure>
 </div>
 
 <h2>{{SECTION_STRUCTURE}}</h2>
 <p class="lede">{{LEDE_STRUCTURE}}</p>
-<figure class="diagram">
+<figure class="panel">
+  <div class="panel-head"><p class="kicker">{{LABEL_STRUCTURE}}</p></div>
   <div class="canvas">
     <!-- One li per file or folder the plan touches. Indent paths with spaces inside .path.
-         Kinds: k-add (+), k-change (~), k-move (→, write "old → new"), k-remove (−), k-keep (·). -->
+         Kinds: k-add (+), k-change (~), k-move (→, write "old → new"), k-remove (−), k-keep (·).
+         Add data-refs with the tokens of the related diagram nodes and change cards. -->
     <ul class="tree">
-      <li class="{{KIND_CLASS}}"><span class="glyph">{{GLYPH}}</span><span class="path">{{PATH}}</span><span class="note">{{NOTE}}</span></li>
+      <li class="{{KIND_CLASS}}" data-refs="{{REFS}}"><span class="glyph">{{GLYPH}}</span><span class="path">{{PATH}}</span><span class="note">{{NOTE}}</span></li>
     </ul>
   </div>
-  <figcaption>{{CAPTION_STRUCTURE}}</figcaption>
+  <figcaption class="panel-foot"><span class="caption">{{CAPTION_STRUCTURE}}</span></figcaption>
 </figure>
 
 <h2>{{SECTION_FLOW}}</h2>
 <p class="lede">{{LEDE_FLOW}}</p>
-<figure class="diagram">
+<figure class="panel">
+  <div class="panel-head"><p class="kicker">{{LABEL_FLOW}}</p></div>
   <div class="canvas"><pre class="mermaid">
 {{FLOW_DIAGRAM: sequenceDiagram or flowchart of a request crossing slices and contexts after the change}}
   </pre></div>
-  <figcaption>{{CAPTION_FLOW}}</figcaption>
+  <figcaption class="panel-foot"><span class="caption">{{CAPTION_FLOW}}</span></figcaption>
 </figure>
 
 <h2>{{SECTION_STEPS}}</h2>
 <p class="lede">{{LEDE_STEPS}}</p>
-<figure class="diagram">
+<figure class="panel">
+  <div class="panel-head"><p class="kicker">{{LABEL_STEPS}}</p></div>
   <div class="canvas"><pre class="mermaid">
 flowchart TB
   %% One node per increment, in order, with the tests that guard it.
   {{STEPS_DIAGRAM}}
   </pre></div>
-  <figcaption>{{CAPTION_STEPS}}</figcaption>
+  <figcaption class="panel-foot"><span class="caption">{{CAPTION_STEPS}}</span></figcaption>
 </figure>
 
 <h2>{{SECTION_CHANGES}}</h2>
 <p class="lede">{{LEDE_CHANGES}}</p>
 <div class="changes">
-  <!-- Repeat one article per change. Every change has a reason and at least one source. -->
-  <article class="change">
-    <div class="change-head">
+  <!-- Repeat one article per change. Every change has a reason and at least one source.
+       data-refs lists the diagram node ids and tree rows this change touches. -->
+  <article class="panel change" data-refs="{{REFS}}">
+    <div class="panel-head change-head">
       <span class="chip {{KIND_CLASS}}"><span class="glyph">{{GLYPH}}</span>{{KIND_LABEL}}</span>
       <h3>{{CHANGE_TITLE}}</h3>
     </div>
     <p class="what">{{WHAT}}</p>
-    <div class="why">
+    <div class="inset why">
       <p class="kicker">{{LABEL_WHY}}</p>
       <p>{{WHY}}</p>
     </div>
-    <div class="sources">
+    <div class="grid-2">
       <div class="inset">
         <p class="kicker">{{LABEL_INTERNAL}}</p>
         <ul><li><code>{{path/to/file.ext:line}}</code> {{what this evidence shows}}</li></ul>
@@ -269,7 +356,7 @@ flowchart TB
         <ul><li><a href="{{URL}}">{{SOURCE_TITLE}}</a> {{which principle applies here}}</li></ul>
       </div>
     </div>
-    <div class="facts">
+    <div class="grid-2">
       <div class="inset"><p class="kicker">{{LABEL_TESTS}}</p><p>{{TESTS_FOR_THIS_CHANGE}}</p></div>
       <div class="inset"><p class="kicker">{{LABEL_RISK}}</p><p>{{RISK_AND_ROLLBACK}}</p></div>
     </div>
@@ -278,7 +365,7 @@ flowchart TB
 
 <h2>{{SECTION_TESTS}}</h2>
 <p class="lede">{{LEDE_TESTS}}</p>
-<section class="surface">
+<section class="panel">
   <table>
     <thead><tr><th>{{COL_TEST}}</th><th>{{COL_KIND}}</th><th>{{COL_PROTECTS}}</th><th>{{COL_STEP}}</th></tr></thead>
     <tbody>
@@ -304,6 +391,205 @@ flowchart TB
 </ul>
 
 </main>
+</div>
+
+<div class="reviewbar" role="region" aria-live="polite">
+  <span><b data-count>0/0</b> <span data-ui="reviewed"></span></span>
+  <span class="bar"><i></i></span>
+  <span data-adjust></span>
+  <span class="keys" data-ui="keys"></span>
+  <button class="copy" data-ui="copy"></button>
+</div>
+<div class="toast" role="status"></div>
+
+<script type="application/json" id="ui-text">
+{
+  "toc": "{{UI_TOC: e.g. Contents}}",
+  "legendHint": "{{UI_LEGEND_HINT: e.g. click to filter · esc to clear}}",
+  "diagramHint": "{{UI_DIAGRAM_HINT: e.g. hover to trace · click to open the change}}",
+  "treeHint": "{{UI_TREE_HINT: e.g. hover to trace · click to open the change}}",
+  "changeHint": "{{UI_CHANGE_HINT: e.g. hover to trace}}",
+  "expand": "{{UI_EXPAND: e.g. expand}}",
+  "close": "{{UI_CLOSE: e.g. close}}",
+  "ok": "{{UI_OK: e.g. ok}}",
+  "adjust": "{{UI_ADJUST: e.g. adjust}}",
+  "pending": "{{UI_PENDING: e.g. pending}}",
+  "notePlaceholder": "{{UI_NOTE_PLACEHOLDER: e.g. What should change here?}}",
+  "reviewed": "{{UI_REVIEWED: e.g. reviewed}}",
+  "adjustment": "{{UI_ADJUSTMENT: e.g. adjustment}}",
+  "adjustments": "{{UI_ADJUSTMENTS: e.g. adjustments}}",
+  "keys": "{{UI_KEYS: e.g. j/k next · esc clear}}",
+  "copy": "{{UI_COPY: e.g. copy review}}",
+  "copied": "{{UI_COPIED: e.g. copied}}",
+  "responseTitle": "{{UI_RESPONSE_TITLE: e.g. Plan review}}",
+  "kinds": { "add": "{{LEGEND_ADD}}", "change": "{{LEGEND_CHANGE}}", "move": "{{LEGEND_MOVE}}", "remove": "{{LEGEND_REMOVE}}", "keep": "{{LEGEND_KEEP}}" }
+}
+</script>
+<script>
+  // Page interactions. Diagram wiring runs again once Mermaid renders.
+  const UI = JSON.parse(document.getElementById("ui-text").textContent);
+  const $ = (s, root = document) => root.querySelector(s);
+  const $$ = (s, root = document) => [...root.querySelectorAll(s)];
+  const KINDS = ["add", "change", "move", "remove", "keep"];
+  const GLYPH = { add: "+", change: "~", move: "→", remove: "−", keep: "·" };
+  const kindOf = (el) => {
+    const chip = el.matches("article") ? $(".change-head .chip", el) : el;
+    return KINDS.find((k) => chip?.classList.contains(k) || chip?.classList.contains("k-" + k)) || "";
+  };
+  const refsOf = (el) => (el.dataset.refs || "").split(/\s+/).filter(Boolean);
+  const labelOf = (el) => {
+    const src = el.matches("article") ? $("h3", el) : el.matches("li") ? $(".path", el) : $(".nodeLabel", el);
+    return (src?.innerText ?? el.textContent).replace(/\s+/g, " ").trim();
+  };
+
+  $$("[data-ui]").forEach((el) => { el.textContent = UI[el.dataset.ui] ?? ""; });
+
+  const toast = (text) => { const t = $(".toast"); t.textContent = text; t.classList.add("is-on"); clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove("is-on"), 1400); };
+  const copy = async (text) => {
+    try { await navigator.clipboard.writeText(text); }
+    catch { const a = Object.assign(document.createElement("textarea"), { value: text }); document.body.append(a); a.select(); document.execCommand("copy"); a.remove(); }
+    toast(UI.copied);
+  };
+  document.addEventListener("click", (e) => { const c = e.target.closest("code"); if (c) copy(c.textContent); });
+
+  // Table of contents with scroll spy.
+  const tocList = $(".toc ol");
+  $$("main h2").forEach((h, i) => {
+    h.id ||= "s" + (i + 1);
+    const a = document.createElement("a");
+    a.href = "#" + h.id;
+    a.append(Object.assign(document.createElement("span"), { textContent: String(i + 1).padStart(2, "0") }), Object.assign(document.createElement("span"), { textContent: h.textContent }));
+    const li = document.createElement("li"); li.append(a); tocList.append(li);
+  });
+  const spy = new IntersectionObserver((entries) => entries.forEach((en) => {
+    if (en.isIntersecting) $$(".toc a").forEach((a) => a.classList.toggle("is-active", a.hash === "#" + en.target.id));
+  }), { rootMargin: "-10% 0px -75% 0px" });
+  $$("main h2").forEach((h) => spy.observe(h));
+
+  // Panel heads get a hint and an expand tool; footers get live meta.
+  const meta = (panel, html) => { const m = $(".meta", panel); if (m) m.innerHTML = html; };
+  const counts = (panel) => {
+    const found = $$(".trace", panel);
+    return KINDS.map((k) => [k, found.filter((i) => i.dataset.kind === k).length]).filter(([, n]) => n).map(([k, n]) => `${GLYPH[k]}${n}`).join(" · ");
+  };
+  $$("figure.panel").forEach((panel) => {
+    const head = $(".panel-head", panel);
+    const hint = Object.assign(document.createElement("span"), { className: "hint", textContent: $(".tree", panel) ? UI.treeHint : UI.diagramHint });
+    const tool = Object.assign(document.createElement("button"), { className: "tool", textContent: UI.expand });
+    tool.addEventListener("click", () => { const on = panel.classList.toggle("is-expanded"); tool.textContent = on ? UI.close : UI.expand; });
+    head.append(hint, tool);
+    $(".panel-foot", panel).append(Object.assign(document.createElement("span"), { className: "meta" }));
+  });
+  $$("article.change").forEach((card) => {
+    $(".panel-head", card).append(Object.assign(document.createElement("span"), { className: "hint", textContent: UI.changeHint }));
+  });
+
+  // Tracing across diagram nodes, tree rows, and change cards.
+  const items = () => $$(".trace");
+  const trace = (source) => {
+    const refs = new Set(refsOf(source));
+    if (!refs.size) return;
+    document.body.classList.add("is-tracing");
+    items().forEach((el) => el.classList.toggle("is-hit", el === source || refsOf(el).some((r) => refs.has(r))));
+    const panel = source.closest("figure.panel");
+    if (panel) meta(panel, `<b>${GLYPH[source.dataset.kind] || "·"}</b> ${UI.kinds[source.dataset.kind] || ""} · ${labelOf(source)}`);
+  };
+  const untrace = (source) => {
+    document.body.classList.remove("is-tracing");
+    items().forEach((el) => el.classList.remove("is-hit"));
+    const panel = source.closest("figure.panel"); if (panel) meta(panel, counts(panel));
+  };
+  const openChange = (source) => {
+    const refs = new Set(refsOf(source));
+    const card = $$("article.change").find((c) => refsOf(c).some((r) => refs.has(r)));
+    if (!card) return;
+    card.scrollIntoView({ block: "start" });
+    card.classList.remove("is-flash"); void card.offsetWidth; card.classList.add("is-flash");
+  };
+  const wire = (el) => {
+    if (el._wired) return; el._wired = true;
+    el.classList.add("trace"); el.dataset.kind = kindOf(el);
+    el.addEventListener("mouseenter", () => trace(el));
+    el.addEventListener("mouseleave", () => untrace(el));
+    if (!el.matches("article")) el.addEventListener("click", () => openChange(el));
+  };
+  function wireAll() {
+    $$("article.change, .tree li").forEach(wire);
+    $$(".mermaid g.node").forEach((g) => {
+      const id = (g.id.match(/flowchart-(.+)-\d+$/) || [])[1];
+      if (id) g.dataset.refs = id;
+      wire(g);
+    });
+    $$("figure.panel").forEach((p) => meta(p, counts(p)));
+    applyKind();
+  }
+
+  // Legend filter.
+  let kind = null;
+  function applyKind() {
+    document.body.classList.toggle("has-kind", !!kind);
+    $$(".legend .chip").forEach((c) => c.setAttribute("aria-pressed", String(c.dataset.kind === kind)));
+    items().forEach((el) => el.classList.toggle("is-off", !!kind && el.dataset.kind !== kind));
+  }
+  $$(".legend .chip").forEach((c) => c.addEventListener("click", () => { kind = kind === c.dataset.kind ? null : c.dataset.kind; applyKind(); }));
+
+  // Review: ok or adjust per change, saved locally, copied as one response.
+  const store = "modular-thinking:" + location.pathname;
+  const saved = JSON.parse(localStorage.getItem(store) || "{}");
+  const cards = $$("article.change");
+  function summary() {
+    const done = cards.filter((c) => c.dataset.review).length;
+    const adj = cards.filter((c) => c.dataset.review === "adjust").length;
+    $("[data-count]").textContent = `${done}/${cards.length}`;
+    $(".reviewbar .bar i").style.width = (cards.length ? (100 * done) / cards.length : 0) + "%";
+    $("[data-adjust]").textContent = adj ? `${adj} ${adj === 1 ? UI.adjustment : UI.adjustments}` : "";
+  }
+  cards.forEach((card, i) => {
+    card.id ||= "change-" + (i + 1);
+    const row = document.createElement("div");
+    row.className = "review";
+    row.innerHTML = `<button class="tool" data-v="ok"></button><button class="tool" data-v="adjust"></button><span class="state"></span><textarea hidden></textarea>`;
+    $("[data-v=ok]", row).textContent = UI.ok;
+    $("[data-v=adjust]", row).textContent = UI.adjust;
+    const note = $("textarea", row); note.placeholder = UI.notePlaceholder;
+    const set = (v, text = note.value) => {
+      card.dataset.review = v;
+      $$("[data-v]", row).forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.v === v)));
+      $(".state", row).textContent = v ? UI[v] : UI.pending;
+      note.hidden = v !== "adjust"; note.value = text;
+      saved[card.id] = { v, note: text }; localStorage.setItem(store, JSON.stringify(saved)); summary();
+    };
+    $$("[data-v]", row).forEach((b) => b.addEventListener("click", () => {
+      set(card.dataset.review === b.dataset.v ? "" : b.dataset.v);
+      if (!note.hidden) note.focus();
+    }));
+    note.addEventListener("input", () => set("adjust"));
+    card.append(row);
+    set(saved[card.id]?.v || "", saved[card.id]?.note || "");
+  });
+  $(".reviewbar .copy").addEventListener("click", () => {
+    const lines = cards.map((c) => {
+      const v = c.dataset.review || "pending";
+      const note = $("textarea", c).value.trim();
+      return `- [${UI[v]}] ${labelOf(c)}${v === "adjust" && note ? `: ${note}` : ""}`;
+    });
+    copy(`${UI.responseTitle}: ${$("h1").textContent.trim()}\n\n${lines.join("\n")}`);
+  });
+
+  // Keyboard: j/k between changes; esc clears the filter and closes expanded panels.
+  document.addEventListener("keydown", (e) => {
+    if (e.target.closest("textarea, input")) return;
+    if (e.key === "Escape") { kind = null; applyKind(); $$(".panel.is-expanded .tool").forEach((t) => t.click()); }
+    if (e.key === "j" || e.key === "k") {
+      const below = cards.findIndex((c) => c.getBoundingClientRect().top > 40);
+      const cur = below === -1 ? cards.length : below;
+      cards[Math.max(0, Math.min(cards.length - 1, e.key === "j" ? cur : cur - 2))]?.scrollIntoView({ block: "start" });
+    }
+  });
+
+  wireAll();
+  window.__wireDiagrams = wireAll;
+</script>
 <script type="module">
   import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs";
   // Stop Mermaid from rendering on load with its defaults, then wait for the
@@ -352,6 +638,7 @@ flowchart TB
     sequence: { mirrorActors: false, useMaxWidth: false, actorMargin: 64, boxMargin: 12, messageMargin: 40 },
   });
   await mermaid.run({ querySelector: ".mermaid" });
+  window.__wireDiagrams?.();
 </script>
 </body>
 </html>

@@ -60,7 +60,7 @@ Find the context whose language matches the feature. If none fits, say whether t
 
 ## Present the plan visually before confirmation
 
-Before asking the user to confirm a plan, render it as a temporary HTML page following [references/plan-presentation.md](references/plan-presentation.md) and its template. The page shows the current and target context maps, every file and folder to add, change, move, or remove, the request flow, the ordered steps, and the test plan, in clean diagrams that cover everything the plan does. Each change states its reason plainly, with internal sources (files, tests, history, what the user said) and external sources (the principles below). Do not edit code until the user confirms, and regenerate the page when the plan changes.
+Before asking the user to confirm a plan, render it as a temporary HTML page following [references/plan-presentation.md](references/plan-presentation.md) and its template. The page shows the current and target context maps, every file and folder to add, change, move, or remove, the request flow, the ordered steps, and the test plan, in clean diagrams that cover everything the plan does. Each change states its reason plainly, with internal sources (files, tests, history, what the user said) and external sources (the principles below). The page is interactive: hovering traces related nodes, files, and changes, and the user can mark each change ok or adjust and copy the review back into the conversation. Treat a pasted review as the user's answer. Do not edit code until the user confirms, and regenerate the page when the plan changes.
 
 ## Migrate with tests as the safety net
 
