@@ -73,6 +73,11 @@ Don't combine local links with a plugin install in the same agent.
 
 1. Create `skills/<name>/SKILL.md` with `name` (matching the folder) and `description` in the frontmatter.
 2. Add `skills/<name>/agents/openai.yaml` with the Codex picker metadata.
-3. Add `./skills/<name>` to the `skills` array in `.claude-plugin/plugin.json`, and bump its `version` so plugin installs pick up the change.
+3. Add `./skills/<name>` to the `skills` array in `.claude-plugin/plugin.json`.
 4. List the skill in this README.
-5. Run `node scripts/check-skills.mjs` and `claude plugin validate .`, then `scripts/link-skills.sh`.
+5. Run `npm run check` and `claude plugin validate .`, then `scripts/link-skills.sh`.
+6. Run `npx changeset` to describe the change.
+
+## Releasing
+
+Any change that should reach plugin installs needs a changeset (`npx changeset`). On every push to `main`, the Release workflow opens a "chore: version skills" pull request that bumps the version in `package.json` and `.claude-plugin/plugin.json` and updates `CHANGELOG.md`. Merging it publishes the release: plugin installs only update when that version changes. Never edit either version by hand.
