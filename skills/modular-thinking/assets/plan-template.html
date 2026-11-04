@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<!--
+  Plan presentation template for the modular-thinking skill.
+  Copy it to the OS temp directory, replace every {{PLACEHOLDER}}, repeat the
+  marked blocks as needed, and delete blocks that do not apply. Keep the file
+  self-contained: inline styles, no local assets.
+-->
+<html lang="{{LANG}}">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{TITLE}}</title>
+<style>
+  :root {
+    --bg: #ffffff; --fg: #1f2328; --muted: #59636e; --line: #d1d9e0; --panel: #f6f8fa;
+    --add: #1a7f37; --change: #9a6700; --move: #0969da; --remove: #cf222e; --keep: #59636e;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0d1117; --fg: #e6edf3; --muted: #9198a1; --line: #3d444d; --panel: #151b23;
+      --add: #3fb950; --change: #d29922; --move: #4493f8; --remove: #f85149; --keep: #9198a1;
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--fg); font: 15px/1.55 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  main { max-width: 1120px; margin: 0 auto; padding: 32px 24px 64px; }
+  h1 { font-size: 26px; margin: 0 0 4px; }
+  h2 { font-size: 19px; margin: 40px 0 12px; padding-bottom: 6px; border-bottom: 1px solid var(--line); }
+  h3 { font-size: 16px; margin: 20px 0 8px; }
+  p, li { max-width: 78ch; }
+  a { color: var(--move); }
+  code { font: 13px ui-monospace, SFMono-Regular, Menlo, monospace; background: var(--panel); padding: 1px 5px; border-radius: 4px; }
+  .meta { color: var(--muted); margin: 0 0 16px; }
+  .status { display: inline-block; padding: 2px 10px; border-radius: 999px; border: 1px solid var(--change); color: var(--change); font-weight: 600; font-size: 13px; }
+  .summary { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 14px 18px; }
+  .legend { display: flex; flex-wrap: wrap; gap: 14px; margin: 8px 0 16px; font-size: 13px; color: var(--muted); }
+  .legend span::before { content: ""; display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 6px; vertical-align: -1px; background: currentColor; }
+  .add { color: var(--add); } .change { color: var(--change); } .move { color: var(--move); } .remove { color: var(--remove); } .keep { color: var(--keep); }
+  figure { margin: 12px 0 20px; padding: 16px; border: 1px solid var(--line); border-radius: 8px; overflow-x: auto; }
+  figcaption { color: var(--muted); font-size: 13px; margin-top: 10px; }
+  .mermaid { text-align: center; }
+  .compare { display: grid; gap: 16px; }
+  .compare figure { margin: 0; }
+  .compare h3 { margin: 0 0 8px; font-size: 14px; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th, td { text-align: left; vertical-align: top; padding: 8px 10px; border-bottom: 1px solid var(--line); }
+  th { color: var(--muted); font-weight: 600; }
+  .tag { display: inline-block; font-size: 12px; font-weight: 600; padding: 0 7px; border-radius: 4px; border: 1px solid currentColor; white-space: nowrap; }
+  .tree { font: 13px/1.7 ui-monospace, SFMono-Regular, Menlo, monospace; white-space: pre; margin: 0; }
+  .card { border: 1px solid var(--line); border-radius: 8px; padding: 14px 18px; margin: 12px 0; }
+  .card h3 { margin-top: 0; }
+  .why { border-left: 3px solid var(--move); padding-left: 12px; }
+  .hypothesis { color: var(--change); font-weight: 600; }
+  ul.sources { padding-left: 18px; }
+</style>
+</head>
+<body>
+<main>
+
+<header>
+  <h1>{{TITLE}}</h1>
+  <p class="meta">{{PROJECT}} · {{SCOPE}} · {{MODE}} · {{DATE}}</p>
+  <span class="status">{{STATUS}}</span>
+</header>
+
+<h2>{{SECTION_SUMMARY}}</h2>
+<div class="summary">
+  <p>{{ONE_PARAGRAPH_SUMMARY: what changes, why, and what stays the same}}</p>
+</div>
+
+<div class="legend">
+  <span class="add">{{LEGEND_ADD}}</span>
+  <span class="change">{{LEGEND_CHANGE}}</span>
+  <span class="move">{{LEGEND_MOVE}}</span>
+  <span class="remove">{{LEGEND_REMOVE}}</span>
+  <span class="keep">{{LEGEND_KEEP}}</span>
+</div>
+
+<h2>{{SECTION_CONTEXT_MAP}}</h2>
+<div class="compare">
+  <figure>
+    <h3>{{LABEL_CURRENT}}</h3>
+    <pre class="mermaid">
+flowchart LR
+  %% Current contexts and relationships. Label each edge with its pattern and direction.
+  {{CURRENT_CONTEXT_MAP}}
+    </pre>
+    <figcaption>{{CAPTION_CURRENT}}</figcaption>
+  </figure>
+  <figure>
+    <h3>{{LABEL_TARGET}}</h3>
+    <pre class="mermaid">
+flowchart LR
+  %% Target contexts. Reuse the class names below so colors match the legend.
+  {{TARGET_CONTEXT_MAP}}
+  classDef add stroke:#1a7f37,stroke-width:2px
+  classDef change stroke:#9a6700,stroke-width:2px
+  classDef move stroke:#0969da,stroke-width:2px
+  classDef remove stroke:#cf222e,stroke-width:2px,stroke-dasharray:4 3
+    </pre>
+    <figcaption>{{CAPTION_TARGET}}</figcaption>
+  </figure>
+</div>
+
+<h2>{{SECTION_STRUCTURE}}</h2>
+<figure>
+<!-- One line per file or folder that the plan touches. Wrap each in a span with add/change/move/remove/keep. -->
+<pre class="tree">{{FILE_TREE}}</pre>
+<figcaption>{{CAPTION_STRUCTURE}}</figcaption>
+</figure>
+
+<h2>{{SECTION_FLOW}}</h2>
+<figure>
+  <pre class="mermaid">
+{{FLOW_DIAGRAM: sequenceDiagram or flowchart of a request crossing slices and contexts after the change}}
+  </pre>
+  <figcaption>{{CAPTION_FLOW}}</figcaption>
+</figure>
+
+<h2>{{SECTION_STEPS}}</h2>
+<figure>
+  <pre class="mermaid">
+flowchart TB
+  %% One node per increment, in order. Show the tests that guard each step.
+  {{STEPS_DIAGRAM}}
+  </pre>
+  <figcaption>{{CAPTION_STEPS}}</figcaption>
+</figure>
+
+<!-- Repeat one card per change. Every change has a reason and at least one source. -->
+<div class="card">
+  <h3><span class="tag {{KIND}}">{{KIND_LABEL}}</span> {{CHANGE_TITLE}}</h3>
+  <p><strong>{{LABEL_WHAT}}</strong> {{WHAT}}</p>
+  <p class="why"><strong>{{LABEL_WHY}}</strong> {{WHY}}</p>
+  <p><strong>{{LABEL_INTERNAL}}</strong></p>
+  <ul class="sources">
+    <li><code>{{path/to/file.ext:line}}</code> {{what this evidence shows}}</li>
+  </ul>
+  <p><strong>{{LABEL_EXTERNAL}}</strong></p>
+  <ul class="sources">
+    <li><a href="{{URL}}">{{SOURCE_TITLE}}</a> {{which principle applies here}}</li>
+  </ul>
+  <p><strong>{{LABEL_TESTS}}</strong> {{TESTS_FOR_THIS_CHANGE}}</p>
+  <p><strong>{{LABEL_RISK}}</strong> {{RISK_AND_ROLLBACK}}</p>
+</div>
+
+<h2>{{SECTION_TESTS}}</h2>
+<table>
+  <thead><tr><th>{{COL_TEST}}</th><th>{{COL_KIND}}</th><th>{{COL_PROTECTS}}</th><th>{{COL_STEP}}</th></tr></thead>
+  <tbody>
+    <!-- Kinds: baseline, characterization (new, pins current behavior), migrated (moved, same assertions), TDD (new boundary behavior). -->
+    <tr><td><code>{{test path or name}}</code></td><td>{{kind}}</td><td>{{behavior}}</td><td>{{step}}</td></tr>
+  </tbody>
+</table>
+
+<h2>{{SECTION_UNCHANGED}}</h2>
+<ul>
+  <li>{{WHAT_STAYS_AS_IS_AND_WHY}}</li>
+</ul>
+
+<h2>{{SECTION_FOLLOW_UPS}}</h2>
+<ul>
+  <li>{{OPTIONAL_ARCHITECTURAL_FOLLOW_UP_NOT_IN_THIS_PLAN}}</li>
+</ul>
+
+<h2>{{SECTION_QUESTIONS}}</h2>
+<ul>
+  <li><span class="hypothesis">{{LABEL_HYPOTHESIS}}</span> {{QUESTION_OR_ASSUMPTION_TO_CONFIRM}}</li>
+</ul>
+
+</main>
+<script type="module">
+  import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs";
+  const dark = matchMedia("(prefers-color-scheme: dark)").matches;
+  const css = getComputedStyle(document.documentElement);
+  mermaid.initialize({
+    startOnLoad: true,
+    theme: dark ? "dark" : "neutral",
+    securityLevel: "strict",
+    themeVariables: {
+      fontFamily: 'system-ui, -apple-system, "Segoe UI", sans-serif',
+      fontSize: "15px",
+      edgeLabelBackground: css.getPropertyValue("--bg").trim(),
+    },
+    flowchart: { curve: "basis", htmlLabels: true, useMaxWidth: false, padding: 12 },
+    sequence: { mirrorActors: false, useMaxWidth: false },
+  });
+</script>
+</body>
+</html>

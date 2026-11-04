@@ -56,13 +56,17 @@ Map each relationship between contexts with a context-mapping pattern; see [refe
 
 ## Place new work without disrupting the architecture
 
-Find the context whose language matches the feature. If none fits, say whether the feature reveals a new context or extends an existing one, with the evidence. Then design the feature as a slice using the existing structure. For example, in a layered codebase keep the layers and group the feature's files by its use case name inside them, or follow the existing feature-module convention. Implement it test-first when the user asks you to build it. Mention a larger restructuring only as an optional follow-up.
+Find the context whose language matches the feature. If none fits, say whether the feature reveals a new context or extends an existing one, with the evidence. Then design the feature as a slice using the existing structure. For example, in a layered codebase keep the layers and group the feature's files by its use case name inside them, or follow the existing feature-module convention. When the user asks you to build it, present the plan visually, then implement it test-first after confirmation. Mention a larger restructuring only as an optional follow-up.
+
+## Present the plan visually before confirmation
+
+Before asking the user to confirm a plan, render it as a temporary HTML page following [references/plan-presentation.md](references/plan-presentation.md) and its template. The page shows the current and target context maps, every file and folder to add, change, move, or remove, the request flow, the ordered steps, and the test plan, in clean diagrams that cover everything the plan does. Each change states its reason plainly, with internal sources (files, tests, history, what the user said) and external sources (the principles below). Do not edit code until the user confirms, and regenerate the page when the plan changes.
 
 ## Migrate with tests as the safety net
 
 Preserving behavior is the priority of every migration. Never move code that no test protects.
 
-1. **Agree the target and the first step.** Confirm the target contexts and slice layout, then choose a small first increment with a clear seam and visible value. Migrate gradually, in the spirit of the strangler fig: old and new structures can coexist through temporary delegation that is removed later. Do not propose a big-bang rewrite.
+1. **Agree the target and the first step.** Propose the target contexts, slice layout, and a small first increment with a clear seam and visible value, present them visually, and wait for the user's confirmation. Migrate gradually, in the spirit of the strangler fig: old and new structures can coexist through temporary delegation that is removed later. Do not propose a big-bang rewrite.
 2. **Establish a baseline.** Run the relevant test suite, type checks, and linters, and record the results before any change. Report pre-existing failures instead of fixing them silently.
 3. **Create missing tests first.** When the behavior to move has no tests, write characterization tests at the most stable boundary available (public function, handler, HTTP endpoint, message consumer). Pin outputs, side effects, and error cases of the current code, including surprising behavior. They must pass against the unmodified code. Avoid testing internals that are about to move.
 4. **Migrate existing tests test-first.** For each slice, follow red, green, refactor. Move or adapt its tests to target the new location and contract first, and watch them fail because the slice does not exist there yet. Move the code until they pass. Then refactor inside the slice with the tests green. Keep the assertions identical: a test is migrated, not rewritten.
@@ -70,11 +74,11 @@ Preserving behavior is the priority of every migration. Never move code that no 
 6. **Keep every step shippable.** After each increment, the full suite passes, old callers either delegate to the new slice or have moved, and the change fits a small, reviewable commit. Remove transitional code once nothing uses it.
 7. **Treat behavior changes and data as separate steps.** If a test fails because behavior changed, stop and restore it; change an assertion only when the user authorized that behavior change, and keep that change in its own step. Plan schema or data moves as separate, reversible steps, and flag them for review.
 
-If the user asks for the plan only, deliver the steps above as a proposal without editing code.
+If the user asks for the plan only, deliver the steps above as the visual proposal without editing code.
 
 ## Report
 
-For Assess and Place new work, deliver:
+Deliver the visual page whenever a plan awaits confirmation or recommendations include structural changes, plus a short chat summary with its absolute path. For Assess and Place new work, cover:
 
 - **Current state**: architectural style, existing boundaries, and test coverage, with cited files.
 - **Context map**: each context with its key terms and their meaning there, the slices it owns, and its relationships with the pattern used, as a list or a small diagram.
