@@ -1,0 +1,16 @@
+{
+  "name": "viniciusamelio-skills",
+  "version": "0.1.0",
+  "description": "Vinícius Amélio's agent skills: small continuous improvements, PR-scoped RFCs, and runtime evidence for pull requests.",
+  "author": {
+    "name": "Vinícius Amélio"
+  },
+  "repository": "https://github.com/viniciusamelio/skills",
+  "license": "MIT",
+  "keywords": ["engineering", "skills", "kaizen", "rfc", "pull-requests"],
+  "skills": [
+    "./skills/kaizen",
+    "./skills/pr-runtime-evidence",
+    "./skills/rfc"
+  ]
+}

@@ -1,0 +1,3 @@
+interface:
+  display_name: "RFC"
+  short_description: "Draft a PR-scoped RFC"

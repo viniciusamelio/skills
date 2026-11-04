@@ -1,4 +1,14 @@
 # Custom skills
 
 Keep all skill instructions, metadata, and supporting resources in English.
-Store each skill in its own directory with a `SKILL.md` entrypoint.
+Store each skill in its own directory under `skills/`, with a `SKILL.md` entrypoint whose frontmatter `name` matches the directory.
+
+Keep skills agent-agnostic: name other skills by their bare name and say to invoke them as skills, without assuming a harness's slash-command syntax or tool names.
+
+Every skill must be installable by every route described in `README.md`:
+
+- `skills/<name>/agents/openai.yaml` holds Codex picker metadata (`interface.display_name`, `interface.short_description`).
+- `.claude-plugin/plugin.json` lists every skill in its `skills` array. Claude Code, Codex, and Copilot install from it through `.claude-plugin/marketplace.json`. Bump `version` in `plugin.json` on every change that should reach plugin installs.
+- `README.md` links every skill to its `SKILL.md`.
+
+After adding, removing, or renaming a skill, run `node scripts/check-skills.mjs`, `claude plugin validate .`, and `scripts/link-skills.sh`.

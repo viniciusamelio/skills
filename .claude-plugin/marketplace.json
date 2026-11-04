@@ -1,0 +1,16 @@
+{
+  "name": "viniciusamelio",
+  "owner": {
+    "name": "Vinícius Amélio"
+  },
+  "description": "Vinícius Amélio's agent skills, as an installable plugin.",
+  "plugins": [
+    {
+      "name": "viniciusamelio-skills",
+      "source": "./",
+      "description": "Small continuous improvements, PR-scoped RFCs, and runtime evidence for pull requests.",
+      "category": "engineering",
+      "keywords": ["engineering", "skills", "kaizen", "rfc", "pull-requests"]
+    }
+  ]
+}
