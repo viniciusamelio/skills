@@ -40,7 +40,7 @@ Separate verified facts from inferences everywhere: an inferred context or bound
 
 ## Visual language
 
-The template follows a monochrome interface: hierarchy comes from stepped surface tones, type weight, and size, never from hue. Keep it that way.
+The template follows a monochrome interface: hierarchy comes from stepped surface tones, type weight, and size. Keep it that way.
 
 - **Surfaces**: the page background is the darkest (or lightest) tone; sections sit on `surface-1`, content inside them on `surface-2`, and emphasis on `surface-3` and `surface-4`. Separate elements by tone and spacing, not by borders.
 - **Type**: large, tight display headings for sections; small uppercase labels for metadata; body text in a muted tone, with the most important sentence (the reason for a change) in the brightest tone.
@@ -50,7 +50,8 @@ The template follows a monochrome interface: hierarchy comes from stepped surfac
   - move `→`: dashed border
   - remove `−`: dotted border, faded and struck through
   - keep `·`: lowest surface, muted text
-- Do not add colors, gradients, shadows, or new fonts.
+- **Labels** are the one accent: blue, uppercase monospace with wide tracking, wrapped in brackets (`[ HYPOTHESIS ]`). Use the template's label classes (`eyebrow`, `kicker`, table headers, `hypothesis`) for every label, such as section kickers, source and risk headings, and hypotheses. The CSS adds the brackets; write only the word.
+- Do not use the accent anywhere else, and do not add other colors, gradients, shadows, or fonts.
 
 ## Diagrams
 
