@@ -4,187 +4,346 @@
   Copy it to the OS temp directory, replace every {{PLACEHOLDER}}, repeat the
   marked blocks as needed, and delete blocks that do not apply. Keep the file
   self-contained: inline styles, no local assets.
+
+  Visual language: monochrome. Hierarchy comes from stepped surface tones,
+  type weight, and size, never from hue. Change kinds are told apart by tone,
+  line style, and a glyph:
+    add     solid light fill, like a primary button     +
+    change  raised surface with a light border          ~
+    move    dashed border                                →
+    remove  dotted border, struck-through, faded         −
+    keep    lowest surface, muted text                   ·
+  In Mermaid, mark nodes with :::add, :::change, :::move, :::remove, or
+  :::keep. The page styles them; do not add classDef or style lines.
 -->
 <html lang="{{LANG}}">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{{TITLE}}</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Work+Sans:wght@600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #ffffff; --fg: #1f2328; --muted: #59636e; --line: #d1d9e0; --panel: #f6f8fa;
-    --add: #1a7f37; --change: #9a6700; --move: #0969da; --remove: #cf222e; --keep: #59636e;
+    color-scheme: dark;
+    --bg: #0b0b0e;
+    --surface-1: #131316;
+    --surface-2: #1a1a1e;
+    --surface-3: #232327;
+    --surface-4: #2c2c31;
+    --line: #34343a;
+    --fg: #fafafa;
+    --fg-2: #d4d4d8;
+    --muted: #9a9aa1;
+    --faint: #63636b;
+    --solid: #fafafa;
+    --on-solid: #0b0b0e;
+    --display: "Work Sans", system-ui, sans-serif;
+    --text: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+    --mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
   }
-  @media (prefers-color-scheme: dark) {
+  @media (prefers-color-scheme: light) {
     :root {
-      --bg: #0d1117; --fg: #e6edf3; --muted: #9198a1; --line: #3d444d; --panel: #151b23;
-      --add: #3fb950; --change: #d29922; --move: #4493f8; --remove: #f85149; --keep: #9198a1;
+      color-scheme: light;
+      --bg: #fafafa;
+      --surface-1: #f1f1f3;
+      --surface-2: #e9e9ec;
+      --surface-3: #dfdfe3;
+      --surface-4: #d4d4d9;
+      --line: #c4c4ca;
+      --fg: #0b0b0e;
+      --fg-2: #2c2c31;
+      --muted: #5f5f66;
+      --faint: #94949b;
+      --solid: #0b0b0e;
+      --on-solid: #fafafa;
     }
   }
   * { box-sizing: border-box; }
-  body { margin: 0; background: var(--bg); color: var(--fg); font: 15px/1.55 system-ui, -apple-system, "Segoe UI", sans-serif; }
-  main { max-width: 1120px; margin: 0 auto; padding: 32px 24px 64px; }
-  h1 { font-size: 26px; margin: 0 0 4px; }
-  h2 { font-size: 19px; margin: 40px 0 12px; padding-bottom: 6px; border-bottom: 1px solid var(--line); }
-  h3 { font-size: 16px; margin: 20px 0 8px; }
-  p, li { max-width: 78ch; }
-  a { color: var(--move); }
-  code { font: 13px ui-monospace, SFMono-Regular, Menlo, monospace; background: var(--panel); padding: 1px 5px; border-radius: 4px; }
-  .meta { color: var(--muted); margin: 0 0 16px; }
-  .status { display: inline-block; padding: 2px 10px; border-radius: 999px; border: 1px solid var(--change); color: var(--change); font-weight: 600; font-size: 13px; }
-  .summary { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 14px 18px; }
-  .legend { display: flex; flex-wrap: wrap; gap: 14px; margin: 8px 0 16px; font-size: 13px; color: var(--muted); }
-  .legend span::before { content: ""; display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 6px; vertical-align: -1px; background: currentColor; }
-  .add { color: var(--add); } .change { color: var(--change); } .move { color: var(--move); } .remove { color: var(--remove); } .keep { color: var(--keep); }
-  figure { margin: 12px 0 20px; padding: 16px; border: 1px solid var(--line); border-radius: 8px; overflow-x: auto; }
-  figcaption { color: var(--muted); font-size: 13px; margin-top: 10px; }
-  .mermaid { text-align: center; }
-  .compare { display: grid; gap: 16px; }
-  .compare figure { margin: 0; }
-  .compare h3 { margin: 0 0 8px; font-size: 14px; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; }
-  table { width: 100%; border-collapse: collapse; font-size: 14px; }
-  th, td { text-align: left; vertical-align: top; padding: 8px 10px; border-bottom: 1px solid var(--line); }
-  th { color: var(--muted); font-weight: 600; }
-  .tag { display: inline-block; font-size: 12px; font-weight: 600; padding: 0 7px; border-radius: 4px; border: 1px solid currentColor; white-space: nowrap; }
-  .tree { font: 13px/1.7 ui-monospace, SFMono-Regular, Menlo, monospace; white-space: pre; margin: 0; }
-  .card { border: 1px solid var(--line); border-radius: 8px; padding: 14px 18px; margin: 12px 0; }
-  .card h3 { margin-top: 0; }
-  .why { border-left: 3px solid var(--move); padding-left: 12px; }
-  .hypothesis { color: var(--change); font-weight: 600; }
-  ul.sources { padding-left: 18px; }
+  body { margin: 0; background: var(--bg); color: var(--fg-2); font: 15px/1.6 var(--text); -webkit-font-smoothing: antialiased; }
+  main { max-width: 1160px; margin: 0 auto; padding: 72px 32px 96px; }
+  a { color: var(--fg); text-underline-offset: 3px; text-decoration-color: var(--faint); }
+  code { font: 13px var(--mono); color: var(--fg); background: var(--surface-3); padding: 2px 7px; border-radius: 6px; }
+
+  .eyebrow { font: 600 12px/1 var(--text); letter-spacing: .12em; text-transform: uppercase; color: var(--muted); margin: 0 0 18px; }
+  h1 { font: 800 clamp(40px, 6vw, 72px)/1.02 var(--display); letter-spacing: -.045em; color: var(--fg); margin: 0 0 24px; max-width: 16ch; }
+  h2 { font: 700 34px/1.1 var(--display); letter-spacing: -.035em; color: var(--fg); margin: 88px 0 8px; }
+  h2 + .lede { margin-top: 0; }
+  h3 { font: 600 18px/1.3 var(--display); letter-spacing: -.01em; color: var(--fg); margin: 0 0 6px; }
+  .lede { color: var(--muted); font-size: 16px; max-width: 70ch; margin: 0 0 24px; }
+  p, li { max-width: 76ch; }
+
+  .pills { display: flex; flex-wrap: wrap; gap: 8px; }
+  .pill { display: inline-flex; align-items: center; gap: 8px; height: 34px; padding: 0 16px; border-radius: 999px; background: var(--surface-2); color: var(--fg-2); font: 500 13px var(--text); }
+  .pill.solid { background: var(--solid); color: var(--on-solid); font-weight: 600; }
+
+  .surface { background: var(--surface-1); border-radius: 32px; padding: 32px; }
+  .inset { background: var(--surface-2); border-radius: 18px; padding: 20px 22px; }
+  .summary { font-size: 19px; line-height: 1.55; color: var(--fg); margin: 48px 0 0; }
+  .summary p { margin: 0; max-width: 64ch; }
+
+  .legend { display: flex; flex-wrap: wrap; gap: 8px; margin: 20px 0 0; }
+  .chip { display: inline-flex; align-items: center; gap: 8px; height: 30px; padding: 0 14px 0 10px; border-radius: 999px; font: 500 13px var(--text); color: var(--fg-2); background: var(--surface-1); }
+  .glyph { display: inline-grid; place-items: center; width: 20px; height: 20px; border-radius: 6px; font: 600 12px/1 var(--mono); }
+  .k-add .glyph { background: var(--solid); color: var(--on-solid); }
+  .k-change .glyph { background: var(--surface-4); color: var(--fg); box-shadow: inset 0 0 0 1.5px var(--fg-2); }
+  .k-move .glyph { background: var(--surface-3); color: var(--fg); outline: 1.5px dashed var(--fg-2); outline-offset: -1.5px; }
+  .k-remove .glyph { color: var(--muted); outline: 1.5px dotted var(--faint); outline-offset: -1.5px; }
+  .k-keep .glyph { background: var(--surface-2); color: var(--faint); }
+
+  .stack { display: grid; gap: 12px; }
+  figure { margin: 0; }
+  .diagram { background: var(--surface-1); border-radius: 32px; padding: 28px 28px 22px; }
+  .diagram .kicker { margin: 0 0 18px; }
+  .canvas { background: var(--surface-2); border-radius: 18px; padding: 28px 16px; overflow-x: auto; }
+  .mermaid { margin: 0; text-align: center; font: 13px var(--mono); color: var(--muted); white-space: pre; }
+  .mermaid[data-processed] { white-space: normal; }
+  figcaption { color: var(--muted); font-size: 14px; margin: 14px 4px 0; }
+
+  .tree { list-style: none; margin: 0; padding: 0; font: 13.5px/1 var(--mono); }
+  .tree li { display: flex; align-items: center; gap: 12px; min-height: 36px; padding: 0 12px; border-radius: 10px; max-width: none; }
+  .tree li + li { margin-top: 2px; }
+  .tree .path { white-space: pre; }
+  .tree .note { margin-left: auto; font: 13px var(--text); color: var(--muted); }
+  .tree .k-add { background: var(--surface-3); color: var(--fg); font-weight: 500; }
+  .tree .k-change { background: var(--surface-2); color: var(--fg); }
+  .tree .k-move { color: var(--fg-2); }
+  .tree .k-remove { color: var(--faint); }
+  .tree .k-remove .path { text-decoration: line-through; text-decoration-color: var(--faint); }
+  .tree .k-keep { color: var(--faint); }
+
+  .changes { display: grid; gap: 12px; }
+  .change { background: var(--surface-1); border-radius: 32px; padding: 32px; display: grid; gap: 20px; }
+  .change-head { display: flex; align-items: center; gap: 12px; }
+  .change-head .chip { background: var(--surface-3); }
+  .change-head h3 { margin: 0; font-size: 22px; letter-spacing: -.02em; }
+  .what { color: var(--fg-2); margin: 0; }
+  .why { background: var(--surface-2); border-radius: 18px; padding: 20px 22px; }
+  .why p:not(.kicker) { margin: 0; color: var(--fg); font-size: 17px; line-height: 1.55; }
+  .sources { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 12px; }
+  .sources ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+  .sources li { color: var(--fg-2); }
+  .facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; }
+  .facts p { margin: 0; }
+  .kicker { font: 600 11px/1 var(--text); letter-spacing: .12em; text-transform: uppercase; color: var(--muted); margin: 0 0 12px; }
+
+  table { width: 100%; border-collapse: separate; border-spacing: 0 4px; font-size: 14px; }
+  th { font: 600 11px var(--text); letter-spacing: .12em; text-transform: uppercase; color: var(--muted); text-align: left; padding: 0 16px 6px; }
+  td { background: var(--surface-2); padding: 14px 16px; vertical-align: top; color: var(--fg-2); }
+  td:first-child { border-radius: 12px 0 0 12px; }
+  td:last-child { border-radius: 0 12px 12px 0; }
+
+  .list { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+  .list li { background: var(--surface-1); border-radius: 18px; padding: 18px 22px; max-width: none; }
+  .hypothesis { display: inline-block; margin-right: 8px; padding: 2px 10px; border-radius: 999px; outline: 1.5px dashed var(--muted); outline-offset: -1.5px; font: 600 12px var(--text); color: var(--fg); }
+
+  /* Mermaid: monochrome node treatments by change kind. */
+  .mermaid svg { max-width: 100%; height: auto; }
+  .mermaid .node rect, .mermaid .node polygon, .mermaid .node circle, .mermaid .node path { rx: 12px; ry: 12px; }
+  .mermaid .node.add rect, .mermaid .node.add polygon, .mermaid .node.add path { fill: var(--solid) !important; stroke: var(--solid) !important; }
+  .mermaid .node.add .nodeLabel, .mermaid .node.add span, .mermaid .node.add p { color: var(--on-solid) !important; fill: var(--on-solid) !important; font-weight: 600; }
+  .mermaid .node.change rect, .mermaid .node.change polygon, .mermaid .node.change path { fill: var(--surface-4) !important; stroke: var(--fg-2) !important; stroke-width: 1.5px !important; }
+  .mermaid .node.move rect, .mermaid .node.move polygon, .mermaid .node.move path { fill: var(--surface-3) !important; stroke: var(--fg-2) !important; stroke-width: 1.5px !important; stroke-dasharray: 6 4; }
+  .mermaid .node.remove rect, .mermaid .node.remove polygon, .mermaid .node.remove path { fill: transparent !important; stroke: var(--faint) !important; stroke-width: 1.5px !important; stroke-dasharray: 2 4; }
+  .mermaid .node.remove .nodeLabel, .mermaid .node.remove span, .mermaid .node.remove p { color: var(--faint) !important; text-decoration: line-through; }
+  .mermaid .node.keep rect, .mermaid .node.keep polygon, .mermaid .node.keep path { fill: var(--surface-2) !important; stroke: var(--line) !important; }
+  .mermaid .node.keep .nodeLabel, .mermaid .node.keep span, .mermaid .node.keep p { color: var(--muted) !important; }
+  .mermaid .edgeLabel, .mermaid .edgeLabel p, .mermaid .edgeLabel span { color: var(--muted) !important; font-size: 12.5px; }
+  .mermaid .cluster rect { rx: 18px; ry: 18px; }
+  .mermaid rect.actor { rx: 12px; ry: 12px; }
 </style>
 </head>
 <body>
 <main>
 
 <header>
+  <p class="eyebrow">{{EYEBROW: e.g. "Modular thinking · Migrate"}}</p>
   <h1>{{TITLE}}</h1>
-  <p class="meta">{{PROJECT}} · {{SCOPE}} · {{MODE}} · {{DATE}}</p>
-  <span class="status">{{STATUS}}</span>
+  <div class="pills">
+    <span class="pill solid">{{STATUS: e.g. awaiting confirmation}}</span>
+    <span class="pill">{{PROJECT}}</span>
+    <span class="pill">{{SCOPE}}</span>
+    <span class="pill">{{DATE}}</span>
+  </div>
 </header>
 
-<h2>{{SECTION_SUMMARY}}</h2>
-<div class="summary">
+<section class="surface summary">
+  <p class="kicker">{{LABEL_SUMMARY}}</p>
   <p>{{ONE_PARAGRAPH_SUMMARY: what changes, why, and what stays the same}}</p>
-</div>
+</section>
 
 <div class="legend">
-  <span class="add">{{LEGEND_ADD}}</span>
-  <span class="change">{{LEGEND_CHANGE}}</span>
-  <span class="move">{{LEGEND_MOVE}}</span>
-  <span class="remove">{{LEGEND_REMOVE}}</span>
-  <span class="keep">{{LEGEND_KEEP}}</span>
+  <span class="chip k-add"><span class="glyph">+</span>{{LEGEND_ADD}}</span>
+  <span class="chip k-change"><span class="glyph">~</span>{{LEGEND_CHANGE}}</span>
+  <span class="chip k-move"><span class="glyph">→</span>{{LEGEND_MOVE}}</span>
+  <span class="chip k-remove"><span class="glyph">−</span>{{LEGEND_REMOVE}}</span>
+  <span class="chip k-keep"><span class="glyph">·</span>{{LEGEND_KEEP}}</span>
 </div>
 
 <h2>{{SECTION_CONTEXT_MAP}}</h2>
-<div class="compare">
-  <figure>
-    <h3>{{LABEL_CURRENT}}</h3>
-    <pre class="mermaid">
+<p class="lede">{{LEDE_CONTEXT_MAP}}</p>
+<div class="stack">
+  <figure class="diagram">
+    <p class="kicker">{{LABEL_CURRENT}}</p>
+    <div class="canvas"><pre class="mermaid">
 flowchart LR
-  %% Current contexts and relationships. Label each edge with its pattern and direction.
+  %% Current contexts. Label each edge with its pattern and direction.
   {{CURRENT_CONTEXT_MAP}}
-    </pre>
+    </pre></div>
     <figcaption>{{CAPTION_CURRENT}}</figcaption>
   </figure>
-  <figure>
-    <h3>{{LABEL_TARGET}}</h3>
-    <pre class="mermaid">
+  <figure class="diagram">
+    <p class="kicker">{{LABEL_TARGET}}</p>
+    <div class="canvas"><pre class="mermaid">
 flowchart LR
-  %% Target contexts. Reuse the class names below so colors match the legend.
+  %% Target contexts. Mark nodes with :::add, :::change, :::move, :::remove, :::keep.
   {{TARGET_CONTEXT_MAP}}
-  classDef add stroke:#1a7f37,stroke-width:2px
-  classDef change stroke:#9a6700,stroke-width:2px
-  classDef move stroke:#0969da,stroke-width:2px
-  classDef remove stroke:#cf222e,stroke-width:2px,stroke-dasharray:4 3
-    </pre>
+    </pre></div>
     <figcaption>{{CAPTION_TARGET}}</figcaption>
   </figure>
 </div>
 
 <h2>{{SECTION_STRUCTURE}}</h2>
-<figure>
-<!-- One line per file or folder that the plan touches. Wrap each in a span with add/change/move/remove/keep. -->
-<pre class="tree">{{FILE_TREE}}</pre>
-<figcaption>{{CAPTION_STRUCTURE}}</figcaption>
+<p class="lede">{{LEDE_STRUCTURE}}</p>
+<figure class="diagram">
+  <div class="canvas">
+    <!-- One li per file or folder the plan touches. Indent paths with spaces inside .path.
+         Kinds: k-add (+), k-change (~), k-move (→, write "old → new"), k-remove (−), k-keep (·). -->
+    <ul class="tree">
+      <li class="{{KIND_CLASS}}"><span class="glyph">{{GLYPH}}</span><span class="path">{{PATH}}</span><span class="note">{{NOTE}}</span></li>
+    </ul>
+  </div>
+  <figcaption>{{CAPTION_STRUCTURE}}</figcaption>
 </figure>
 
 <h2>{{SECTION_FLOW}}</h2>
-<figure>
-  <pre class="mermaid">
+<p class="lede">{{LEDE_FLOW}}</p>
+<figure class="diagram">
+  <div class="canvas"><pre class="mermaid">
 {{FLOW_DIAGRAM: sequenceDiagram or flowchart of a request crossing slices and contexts after the change}}
-  </pre>
+  </pre></div>
   <figcaption>{{CAPTION_FLOW}}</figcaption>
 </figure>
 
 <h2>{{SECTION_STEPS}}</h2>
-<figure>
-  <pre class="mermaid">
+<p class="lede">{{LEDE_STEPS}}</p>
+<figure class="diagram">
+  <div class="canvas"><pre class="mermaid">
 flowchart TB
-  %% One node per increment, in order. Show the tests that guard each step.
+  %% One node per increment, in order, with the tests that guard it.
   {{STEPS_DIAGRAM}}
-  </pre>
+  </pre></div>
   <figcaption>{{CAPTION_STEPS}}</figcaption>
 </figure>
 
-<!-- Repeat one card per change. Every change has a reason and at least one source. -->
-<div class="card">
-  <h3><span class="tag {{KIND}}">{{KIND_LABEL}}</span> {{CHANGE_TITLE}}</h3>
-  <p><strong>{{LABEL_WHAT}}</strong> {{WHAT}}</p>
-  <p class="why"><strong>{{LABEL_WHY}}</strong> {{WHY}}</p>
-  <p><strong>{{LABEL_INTERNAL}}</strong></p>
-  <ul class="sources">
-    <li><code>{{path/to/file.ext:line}}</code> {{what this evidence shows}}</li>
-  </ul>
-  <p><strong>{{LABEL_EXTERNAL}}</strong></p>
-  <ul class="sources">
-    <li><a href="{{URL}}">{{SOURCE_TITLE}}</a> {{which principle applies here}}</li>
-  </ul>
-  <p><strong>{{LABEL_TESTS}}</strong> {{TESTS_FOR_THIS_CHANGE}}</p>
-  <p><strong>{{LABEL_RISK}}</strong> {{RISK_AND_ROLLBACK}}</p>
+<h2>{{SECTION_CHANGES}}</h2>
+<p class="lede">{{LEDE_CHANGES}}</p>
+<div class="changes">
+  <!-- Repeat one article per change. Every change has a reason and at least one source. -->
+  <article class="change">
+    <div class="change-head">
+      <span class="chip {{KIND_CLASS}}"><span class="glyph">{{GLYPH}}</span>{{KIND_LABEL}}</span>
+      <h3>{{CHANGE_TITLE}}</h3>
+    </div>
+    <p class="what">{{WHAT}}</p>
+    <div class="why">
+      <p class="kicker">{{LABEL_WHY}}</p>
+      <p>{{WHY}}</p>
+    </div>
+    <div class="sources">
+      <div class="inset">
+        <p class="kicker">{{LABEL_INTERNAL}}</p>
+        <ul><li><code>{{path/to/file.ext:line}}</code> {{what this evidence shows}}</li></ul>
+      </div>
+      <div class="inset">
+        <p class="kicker">{{LABEL_EXTERNAL}}</p>
+        <ul><li><a href="{{URL}}">{{SOURCE_TITLE}}</a> {{which principle applies here}}</li></ul>
+      </div>
+    </div>
+    <div class="facts">
+      <div class="inset"><p class="kicker">{{LABEL_TESTS}}</p><p>{{TESTS_FOR_THIS_CHANGE}}</p></div>
+      <div class="inset"><p class="kicker">{{LABEL_RISK}}</p><p>{{RISK_AND_ROLLBACK}}</p></div>
+    </div>
+  </article>
 </div>
 
 <h2>{{SECTION_TESTS}}</h2>
-<table>
-  <thead><tr><th>{{COL_TEST}}</th><th>{{COL_KIND}}</th><th>{{COL_PROTECTS}}</th><th>{{COL_STEP}}</th></tr></thead>
-  <tbody>
-    <!-- Kinds: baseline, characterization (new, pins current behavior), migrated (moved, same assertions), TDD (new boundary behavior). -->
-    <tr><td><code>{{test path or name}}</code></td><td>{{kind}}</td><td>{{behavior}}</td><td>{{step}}</td></tr>
-  </tbody>
-</table>
+<p class="lede">{{LEDE_TESTS}}</p>
+<section class="surface">
+  <table>
+    <thead><tr><th>{{COL_TEST}}</th><th>{{COL_KIND}}</th><th>{{COL_PROTECTS}}</th><th>{{COL_STEP}}</th></tr></thead>
+    <tbody>
+      <!-- Kinds: baseline, characterization (new, pins current behavior), migrated (moved, same assertions), TDD (new boundary behavior). -->
+      <tr><td><code>{{test path or name}}</code></td><td>{{kind}}</td><td>{{behavior}}</td><td>{{step}}</td></tr>
+    </tbody>
+  </table>
+</section>
 
 <h2>{{SECTION_UNCHANGED}}</h2>
-<ul>
+<ul class="list">
   <li>{{WHAT_STAYS_AS_IS_AND_WHY}}</li>
 </ul>
 
 <h2>{{SECTION_FOLLOW_UPS}}</h2>
-<ul>
+<ul class="list">
   <li>{{OPTIONAL_ARCHITECTURAL_FOLLOW_UP_NOT_IN_THIS_PLAN}}</li>
 </ul>
 
 <h2>{{SECTION_QUESTIONS}}</h2>
-<ul>
-  <li><span class="hypothesis">{{LABEL_HYPOTHESIS}}</span> {{QUESTION_OR_ASSUMPTION_TO_CONFIRM}}</li>
+<ul class="list">
+  <li><span class="hypothesis">{{LABEL_HYPOTHESIS}}</span>{{QUESTION_OR_ASSUMPTION_TO_CONFIRM}}</li>
 </ul>
 
 </main>
 <script type="module">
   import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs";
-  const dark = matchMedia("(prefers-color-scheme: dark)").matches;
+  // Stop Mermaid from rendering on load with its defaults, then wait for the
+  // stylesheets and web fonts so colors resolve and labels measure correctly.
+  mermaid.initialize({ startOnLoad: false });
+  if (document.readyState !== "complete") await new Promise((done) => addEventListener("load", done, { once: true }));
+  await document.fonts.ready;
   const css = getComputedStyle(document.documentElement);
+  const v = (name) => css.getPropertyValue(name).trim();
   mermaid.initialize({
-    startOnLoad: true,
-    theme: dark ? "dark" : "neutral",
+    startOnLoad: false,
+    theme: "base",
     securityLevel: "strict",
     themeVariables: {
-      fontFamily: 'system-ui, -apple-system, "Segoe UI", sans-serif',
-      fontSize: "15px",
-      edgeLabelBackground: css.getPropertyValue("--bg").trim(),
+      fontFamily: v("--text"),
+      fontSize: "14px",
+      background: v("--surface-2"),
+      primaryColor: v("--surface-3"),
+      primaryTextColor: v("--fg"),
+      primaryBorderColor: v("--line"),
+      secondaryColor: v("--surface-3"),
+      tertiaryColor: v("--surface-1"),
+      lineColor: v("--muted"),
+      textColor: v("--fg-2"),
+      edgeLabelBackground: v("--surface-2"),
+      clusterBkg: v("--surface-1"),
+      clusterBorder: v("--line"),
+      titleColor: v("--fg"),
+      actorBkg: v("--surface-3"),
+      actorBorder: v("--line"),
+      actorTextColor: v("--fg"),
+      actorLineColor: v("--line"),
+      signalColor: v("--muted"),
+      signalTextColor: v("--fg-2"),
+      labelBoxBkgColor: v("--surface-3"),
+      labelBoxBorderColor: v("--line"),
+      labelTextColor: v("--fg"),
+      loopTextColor: v("--fg-2"),
+      noteBkgColor: v("--surface-4"),
+      noteBorderColor: v("--line"),
+      noteTextColor: v("--fg"),
+      activationBkgColor: v("--surface-4"),
+      activationBorderColor: v("--fg-2"),
     },
-    flowchart: { curve: "basis", htmlLabels: true, useMaxWidth: false, padding: 12 },
-    sequence: { mirrorActors: false, useMaxWidth: false },
+    flowchart: { curve: "basis", htmlLabels: true, useMaxWidth: false, padding: 14, nodeSpacing: 40, rankSpacing: 56 },
+    sequence: { mirrorActors: false, useMaxWidth: false, actorMargin: 64, boxMargin: 12, messageMargin: 40 },
   });
+  await mermaid.run({ querySelector: ".mermaid" });
 </script>
 </body>
 </html>

@@ -38,9 +38,24 @@ Before asking the user to confirm a plan, render it as a temporary HTML page so 
 
 Separate verified facts from inferences everywhere: an inferred context or boundary is labeled as a hypothesis, with the evidence behind it.
 
+## Visual language
+
+The template follows a monochrome interface: hierarchy comes from stepped surface tones, type weight, and size, never from hue. Keep it that way.
+
+- **Surfaces**: the page background is the darkest (or lightest) tone; sections sit on `surface-1`, content inside them on `surface-2`, and emphasis on `surface-3` and `surface-4`. Separate elements by tone and spacing, not by borders.
+- **Type**: large, tight display headings for sections; small uppercase labels for metadata; body text in a muted tone, with the most important sentence (the reason for a change) in the brightest tone.
+- **Change kinds** are told apart by tone, line style, and a glyph, so they stay readable without color:
+  - add `+`: solid fill in the foreground tone, like a primary button
+  - change `~`: raised surface with a light border
+  - move `→`: dashed border
+  - remove `−`: dotted border, faded and struck through
+  - keep `·`: lowest surface, muted text
+- Do not add colors, gradients, shadows, or new fonts.
+
 ## Diagrams
 
-- Prefer clean diagrams: few node shapes, short labels, consistent colors that match the legend (`add`, `change`, `move`, `remove`), and left-to-right or top-to-bottom flow without crossing edges where possible.
+- Prefer clean diagrams: rounded nodes, short labels, few node shapes, and left-to-right or top-to-bottom flow without crossing edges where possible. Use top-to-bottom for sequences of more than four steps.
+- Mark Mermaid nodes with `:::add`, `:::change`, `:::move`, `:::remove`, or `:::keep`. The page styles these classes; do not add `classDef` or `style` lines, or colors of any kind.
 - Cover everything the plan does. Every context, slice, moved group of files, contract, and step must appear in at least one diagram. When a diagram gets crowded, split it, for example one diagram per context, instead of dropping detail.
-- Use the Mermaid blocks in the template (`flowchart` for context maps and steps, `sequenceDiagram` for request flow). Quote labels that contain punctuation (`A["Billing: Invoice"]`). Keep each diagram's source readable, because it is the fallback when Mermaid cannot load.
+- Use `flowchart` for context maps and steps, and `sequenceDiagram` for request flow. Quote labels that contain punctuation (`A["Billing: Invoice"]`). Keep each diagram's source readable, because it is the fallback when Mermaid cannot load.
 - Give each diagram a caption that says what to look at.
