@@ -1,0 +1,3 @@
+interface:
+  display_name: "Modular Thinking"
+  short_description: "Bounded contexts and vertical slices"
