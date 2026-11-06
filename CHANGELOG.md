@@ -1,5 +1,11 @@
 # viniciusamelio-skills
 
+## 0.4.0
+
+### Minor Changes
+
+- [#5](https://github.com/viniciusamelio/skills/pull/5) [`5e800d1`](https://github.com/viniciusamelio/skills/commit/5e800d1066db9f2c7be11403415edb393a69919b) Thanks [@viniciusamelio](https://github.com/viniciusamelio)! - Add `ui-prototype`, a skill that prototypes the front end of a user flow in two gated stages: a grayscale mid-fi with defined blocks, hierarchy, surface tones, real key copy, annotations, and side-by-side variants for open decisions, then, only after the user approves it, a hi-fi built on the project's design system, with accessibility and handoff documentation. It offers the prototyping apps the agent can reach (Figma, Paper, Pencil, OpenPencil, Penpot, and similar) and always a self-contained HTML file, which becomes the handoff document.
+
 ## 0.3.0
 
 ### Minor Changes
