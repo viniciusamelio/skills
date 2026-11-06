@@ -13,9 +13,18 @@ Before asking the user to confirm a plan, render it as a temporary HTML page so 
 - Start from [../assets/plan-template.html](../assets/plan-template.html). Replace every `{{PLACEHOLDER}}`, repeat the marked blocks, and delete blocks that do not apply. Leave no placeholder in the final page.
 - Write the file to the OS temp directory (`$TMPDIR`, else `/tmp`; `%TEMP%` on Windows), named `modular-thinking-<project>-<yyyymmdd-hhmm>.html`. Never write it inside the repository, and never commit it.
 - Write all visible text in the user's language. Keep code, paths, and identifiers as they are.
+- Pre-render the diagrams: `node <skill-dir>/scripts/render-diagrams.mjs <page.html>`. It replaces each Mermaid block with an inline SVG, using a local Chromium-based browser (Chrome, Edge, Chromium, Brave; `CHROME_PATH` picks one), Node 22 or later, and network access to the Mermaid CDN. When it reports a parse error, fix that diagram and run it again. When it warns that a diagram is too wide, reshape the diagram (see Diagrams) and run it again. If it cannot run, tell the user that the diagrams will render only where the page's scripts and network access work; the Mermaid source stays readable either way.
 - Open it with the platform's opener (`open` on macOS, `xdg-open` on Linux, `start` on Windows) when the environment allows. Always give the user the absolute path.
 - In the chat, give a short summary and ask for confirmation. The page is the detailed version; do not repeat it in full.
-- The page is a proposal: show the status as awaiting confirmation, and do not edit code until the user confirms.
+- The page is a proposal: show the status as awaiting confirmation, and do not edit code until the user confirms. Confirmation and adjustments come through the conversation, or through comments where the user shared the page, such as an issue or pull request.
+
+## A static document
+
+The page is a static document that the user may attach to an issue or a pull request. Viewers there can block scripts and network requests, and readers use any screen size, so:
+
+- Everything must read with scripts disabled: content, labels, legend, diagrams (pre-rendered), and file tree. Scripts only add extras (see Extras).
+- Keep the template's responsive rules: long words, paths, and code wrap; tables and diagrams scroll inside their panels instead of widening the page. Do not add fixed widths.
+- Do not add controls that only work in one browser, such as approval buttons, notes, or state saved in the browser. Reviewers answer where the page is shared.
 
 ## What the page must contain
 
@@ -51,21 +60,21 @@ The template follows a monochrome interface: hierarchy comes from stepped surfac
   - remove `−`: dotted border, faded and struck through
   - keep `·`: lowest surface, muted text
 - **Labels and interaction state** are the one accent: blue, uppercase monospace with wide tracking, wrapped in brackets (`[ HYPOTHESIS ]`). Use the template's label classes (`eyebrow`, `kicker`, table headers, `hypothesis`) for every label, such as section kickers, source and risk headings, and hypotheses. The CSS adds the brackets; write only the word.
-- The accent also marks interaction state: traced elements, the active filter, focus, and review progress. Do not use it anywhere else, and do not add other colors, gradients, shadows, or fonts.
+- The accent also marks interaction state: traced elements, the active filter, and focus. Do not use it anywhere else, and do not add other colors, gradients, shadows, or fonts.
 
-## Interactions
+## Extras
 
-The template wires these interactions; the page only needs consistent markup:
+When scripts run, the template adds these extras; the page only needs consistent markup:
 
 - **Tracing**: hovering a diagram node, a file row, or a change card highlights everything that shares one of its ref tokens and dims the rest. A Mermaid node's token is its id (`B` in `B["Billing"]`). Give each change card and file row a `data-refs` attribute listing the node ids and any extra tokens that connect them, so every change is reachable from its diagram nodes and files. Clicking a node or a row opens the first change card that shares a token.
 - **Filter**: the legend chips filter every diagram, row, and card by change kind.
-- **Review**: each change card gets ok and adjust controls with a note, saved in the browser. The review bar shows progress and copies a plain-text review the user can paste back into the conversation. Tell the user about it when you share the page, and treat a pasted review as their answer: apply the adjustments, regenerate the page, and ask again.
 - **Navigation**: a contents list with scroll tracking, expandable diagram panels, click-to-copy on code and paths, and `j`/`k`/`Esc` shortcuts.
 - Translate the strings in the `ui-text` block with the rest of the page.
 
 ## Diagrams
 
 - Prefer clean diagrams: rounded nodes, short labels, few node shapes, and left-to-right or top-to-bottom flow without crossing edges where possible. Use top-to-bottom for sequences of more than four steps.
+- Keep every diagram within 960px of natural width, so it fits a narrow screen at a legible size; the render script warns past that. Node labels are names, not sentences (about 24 characters; details go in the change cards), and edge labels are a pattern name or a short verb. Siblings line up across the flow: in `flowchart TB` they form a row, in `flowchart LR` a column, so pick the direction that stacks the larger group and keep the other direction to about four nodes. Keep sequence diagrams to about five participants. When a diagram still does not fit, split it.
 - Mark Mermaid nodes with `:::add`, `:::change`, `:::move`, `:::remove`, or `:::keep`. The page styles these classes; do not add `classDef` or `style` lines, or colors of any kind.
 - Cover everything the plan does. Every context, slice, moved group of files, contract, and step must appear in at least one diagram. When a diagram gets crowded, split it, for example one diagram per context, instead of dropping detail.
 - Use `flowchart` for context maps and steps, and `sequenceDiagram` for request flow. Quote labels that contain punctuation (`A["Billing: Invoice"]`). Keep each diagram's source readable, because it is the fallback when Mermaid cannot load.

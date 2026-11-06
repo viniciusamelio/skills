@@ -11,6 +11,7 @@
   "skills": [
     "./skills/kaizen",
     "./skills/modular-thinking",
+    "./skills/pr-agent",
     "./skills/pr-runtime-evidence",
     "./skills/rfc"
   ]
