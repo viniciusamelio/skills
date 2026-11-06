@@ -13,6 +13,7 @@
     "./skills/modular-thinking",
     "./skills/pr-agent",
     "./skills/pr-runtime-evidence",
-    "./skills/rfc"
+    "./skills/rfc",
+    "./skills/ui-prototype"
   ]
 }
