@@ -1,6 +1,6 @@
 {
   "name": "viniciusamelio-skills",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Vinícius Amélio's agent skills: small continuous improvements, PR-scoped RFCs, and runtime evidence for pull requests.",
   "author": {
     "name": "Vinícius Amélio"
