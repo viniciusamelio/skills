@@ -70,6 +70,7 @@ Don't combine local links with a plugin install in the same agent.
 - **[pr-agent](./skills/pr-agent/SKILL.md)**: Describe, review, improve, or answer questions about a pull request or local diff using PR-Agent's methods, with code suggestions scored in a second pass that drops weak ones, and optional publishing to the PR.
 - **[pr-runtime-evidence](./skills/pr-runtime-evidence/SKILL.md)**: Investigate stored crashes and logs related to code planned for or changed in a PR, connecting them to scoped prevention and regression coverage.
 - **[rfc](./skills/rfc/SKILL.md)**: Draft or revise a PR-scoped RFC, ready for the Issue and pull request descriptions.
+- **[ui-prototype](./skills/ui-prototype/SKILL.md)**: Prototype the front end of a flow as a grayscale mid-fi, then, after approval, refine it into a hi-fi with handoff documentation, in a connected prototyping app or a self-contained HTML file.
 
 ## Adding a skill
 

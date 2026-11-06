@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<!--
+  Mid-fi prototype template.
+  - Set data-theme to "light" or "dark" on <html> to match the product.
+  - Keep the tokens and primitives; replace the example flow below.
+  - Rules: references/mid-fi.md. No colors outside the tokens, no lorem ipsum.
+-->
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Flow name · mid-fi · V1</title>
+<style>
+  :root, [data-theme="light"] {
+    --canvas: #fafaf8; --frame-edge: #262624; --page: #ecebe7;
+    --surface-1: #e1e0db; --surface-2: #d5d4ce; --surface-3: #c8c7c1; --hero: #8e8d87; --on-hero: #c8c7c1;
+    --ink-strong: #2b2a27; --ink: #57564f; --ink-weak: #8a8983;
+    --bar-strong: #9e9d97; --bar: #c6c5bf;
+    --action: #7a7973; --action-ink: #ffffff; --action-2: #a9a8a2; --action-2-ink: #ffffff;
+    --line: #d0cfc9; --note: #6f6e68; --overlay-shadow: 0 -10px 30px rgba(0, 0, 0, .10);
+    --sheet: #f6f5f1;
+  }
+  [data-theme="dark"] {
+    --canvas: #1b1b1b; --frame-edge: #2e2e2e; --page: #0e0e0e;
+    --surface-1: #171717; --surface-2: #202020; --surface-3: #2a2a2a; --hero: #262626; --on-hero: #3d3d3d;
+    --ink-strong: #f2f2f2; --ink: #a6a6a6; --ink-weak: #6e6e6e;
+    --bar-strong: #4a4a4a; --bar: #333333;
+    --action: #f2f2f2; --action-ink: #111111; --action-2: #2a2a2a; --action-2-ink: #f2f2f2;
+    --line: #262626; --note: #9a9a9a; --overlay-shadow: 0 -10px 30px rgba(0, 0, 0, .5);
+    --sheet: #171717;
+  }
+
+  * { box-sizing: border-box; margin: 0; }
+  body {
+    background: var(--canvas); color: var(--ink);
+    font: 14px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    padding: 32px 40px 64px;
+  }
+
+  /* Canvas: header, flow groups, rows of frames, notes */
+  .canvas-head { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; margin-bottom: 40px; }
+  .canvas-head h1 { font-size: 22px; color: var(--ink-strong); font-weight: 600; }
+  .tag { font-size: 12px; padding: 2px 8px; border: 1px solid var(--line); border-radius: 6px; color: var(--ink); }
+  .meta { font-size: 13px; color: var(--ink-weak); }
+  .group { margin-bottom: 56px; }
+  .group > h2 { font-size: 16px; color: var(--ink-strong); font-weight: 600; margin-bottom: 4px; }
+  .group > p { color: var(--ink-weak); margin-bottom: 20px; max-width: 72ch; }
+  .row { display: flex; gap: 40px; align-items: flex-start; overflow-x: auto; padding-bottom: 16px; }
+  .item { flex: none; }
+  .label { font-size: 15px; font-weight: 600; color: var(--ink-strong); margin-bottom: 10px; }
+  .designer-note { flex: none; width: 220px; padding-top: 32px; color: var(--note); font-size: 13px; }
+  .designer-note strong { display: block; color: var(--ink-strong); font-weight: 500; margin-bottom: 8px; }
+
+  /* Frames */
+  .frame { position: relative; overflow: hidden; background: var(--page); }
+  .frame.mobile { width: 360px; height: 760px; border: 8px solid var(--frame-edge); border-radius: 44px; }
+  .frame.desktop { width: 1280px; min-height: 720px; border: 1px solid var(--line); border-radius: 8px; }
+  .screen { display: flex; flex-direction: column; gap: 16px; padding: 24px 20px; }
+  .frame.desktop .screen { padding: 24px 64px; gap: 24px; }
+
+  /* Real type, mid-fi scale */
+  .display { font-size: 32px; line-height: 1.15; font-weight: 600; color: var(--ink-strong); }
+  .title { font-size: 20px; line-height: 1.25; font-weight: 600; color: var(--ink-strong); }
+  .body { font-size: 14px; color: var(--ink); }
+  .caption { font-size: 12px; color: var(--ink-weak); }
+
+  /* Placeholder primitives */
+  .bar { height: 10px; border-radius: 5px; background: var(--bar); }
+  .bar.strong { height: 18px; border-radius: 9px; background: var(--bar-strong); }
+  .lines { display: flex; flex-direction: column; gap: 8px; }
+  .circle { flex: none; width: 44px; height: 44px; border-radius: 50%; background: var(--surface-3); }
+  .circle.lg { width: 64px; height: 64px; }
+  .circle.empty { background: transparent; border: 2px dashed var(--bar-strong); }
+  .media {
+    display: grid; place-items: center; text-align: center; padding: 12px;
+    background: var(--surface-3); border-radius: 12px; color: var(--note); font-size: 12px;
+  }
+  .hero { background: var(--hero); border-radius: 0 0 32px 32px; margin: -24px -20px 0; }
+  .hero .circle:not(.empty), .hero .media { background: var(--on-hero); }
+
+  /* Surfaces and blocks */
+  .card { background: var(--surface-1); border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 12px; }
+  .card .card, .well { background: var(--surface-2); }
+  .well { border-radius: 12px; padding: 12px; }
+  .list-row { display: flex; gap: 12px; align-items: center; }
+  .list-row .lines { flex: 1; }
+  .stack { display: flex; flex-direction: column; gap: 10px; }
+  .cluster { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+  .spacer { flex: 1; }
+  .nav { display: flex; align-items: center; gap: 24px; padding: 12px 16px; background: var(--surface-1); border-radius: 12px; }
+  .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+
+  /* Actions: one primary per screen */
+  .btn {
+    display: flex; align-items: center; justify-content: center; height: 44px; padding: 0 20px;
+    border: 0; border-radius: 10px; font-family: inherit; font-size: 14px; font-weight: 600; line-height: 1;
+    background: var(--action); color: var(--action-ink);
+  }
+  .btn.secondary { background: var(--action-2); color: var(--action-2-ink); }
+  .btn.text { background: none; color: var(--ink-strong); font-weight: 500; }
+  .input { height: 44px; border-radius: 10px; background: var(--surface-2); display: flex; align-items: center; padding: 0 14px; color: var(--ink-weak); }
+
+  /* Overlays: the only place a shadow is allowed */
+  .sheet {
+    position: absolute; left: 0; right: 0; bottom: 0; background: var(--sheet);
+    border-radius: 28px 28px 0 0; box-shadow: var(--overlay-shadow);
+    padding: 24px 20px 32px; display: flex; flex-direction: column; gap: 14px;
+  }
+  .scrim { position: absolute; inset: 0; background: rgba(0, 0, 0, .25); }
+
+  /* In-frame annotation */
+  .anno { font-size: 12px; line-height: 1.4; color: var(--note); }
+</style>
+</head>
+<body>
+
+<header class="canvas-head">
+  <span class="tag">V1</span>
+  <h1>Flow name</h1>
+  <span class="meta">mid-fi · awaiting review · YYYY-MM-DD</span>
+</header>
+
+<!-- Example group with two variants for one open decision. Replace it. -->
+<section class="group">
+  <h2>1. Account</h2>
+  <p>Open decision: where the sign-up offer appears after the first watering.</p>
+  <div class="row">
+
+    <div class="item">
+      <div class="label">Account · A: sheet over Today</div>
+      <div class="frame mobile">
+        <div class="screen">
+          <div class="hero" style="height:220px"></div>
+        </div>
+        <div class="scrim"></div>
+        <div class="sheet">
+          <div class="cluster">
+            <div class="circle lg"></div><div class="circle lg"></div><div class="circle lg empty"></div>
+          </div>
+          <div class="anno">row of their plants (rings from Today)</div>
+          <div class="title">Keep your garden safe</div>
+          <div class="lines"><div class="bar" style="width:100%"></div><div class="bar" style="width:70%"></div></div>
+          <div class="btn">Continue with Apple</div>
+          <div class="btn secondary">Continue with Google</div>
+          <div class="btn text">Not now</div>
+          <div class="anno" style="text-align:center">(on the 2nd watering, "Not now" disappears)</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="item">
+      <div class="label">Account · B: full screen with header</div>
+      <div class="frame mobile">
+        <div class="screen">
+          <div class="hero" style="height:240px; display:flex; flex-direction:column; justify-content:flex-end; padding:20px">
+            <div class="cluster" style="justify-content:center"><div class="circle lg"></div><div class="circle lg"></div></div>
+            <div class="anno" style="margin-top:12px">large plants on the green</div>
+          </div>
+          <div class="title">Keep your garden safe</div>
+          <div class="lines"><div class="bar" style="width:90%"></div></div>
+          <div class="card">
+            <div class="anno">card: what stays saved (5 plants · 23 logs · cycles)</div>
+          </div>
+          <div class="spacer"></div>
+          <div class="btn">Continue with Apple</div>
+          <div class="btn secondary">Continue with Google</div>
+        </div>
+      </div>
+    </div>
+
+    <aside class="designer-note">
+      <strong>Designer note</strong>
+      A interrupts less but hides what is saved. B explains the value first. Review: which one makes "Not now" feel safe?
+    </aside>
+  </div>
+</section>
+
+<!-- Example list screen with a state frame. Replace it. -->
+<section class="group">
+  <h2>2. Removed plants</h2>
+  <p>Screen and its empty state.</p>
+  <div class="row">
+    <div class="item">
+      <div class="label">Removed</div>
+      <div class="frame mobile">
+        <div class="screen">
+          <div class="circle"></div>
+          <div class="title">Removed plants</div>
+          <div class="bar" style="width:55%"></div>
+          <div class="card">
+            <div class="list-row"><div class="circle"></div><div class="lines"><div class="bar strong" style="width:60%"></div><div class="bar" style="width:85%"></div></div></div>
+            <div class="list-row"><div class="circle"></div><div class="lines"><div class="bar strong" style="width:50%"></div><div class="bar" style="width:80%"></div></div></div>
+            <div class="anno">faded plant · reason icon · "83 days in the garden · left Nov 2"</div>
+          </div>
+          <div class="anno">tap → sheet with what comes back and "Bring back"</div>
+        </div>
+      </div>
+    </div>
+    <div class="item">
+      <div class="label">Removed · empty</div>
+      <div class="frame mobile">
+        <div class="screen" style="height:100%; justify-content:center; align-items:center; text-align:center">
+          <div class="media" style="width:120px; height:120px; border-radius:50%">illustration</div>
+          <div class="title">No removed plants</div>
+          <div class="body">Plants you remove stay here for 30 days.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Example desktop frame. Delete if the flow is mobile only. -->
+<section class="group">
+  <h2>3. Landing</h2>
+  <p>Desktop, 1280 wide.</p>
+  <div class="row">
+    <div class="item">
+      <div class="label">Landing</div>
+      <div class="frame desktop">
+        <div class="screen">
+          <div class="nav"><div class="media" style="width:28px; height:28px; padding:0; border-radius:6px"></div><span class="body" style="color:var(--ink-strong)">Product</span><div class="spacer"></div><span class="body">Pricing</span><span class="body">About</span><div class="btn" style="height:36px">Get started</div></div>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:48px; padding:56px 0">
+            <div class="stack" style="gap:20px">
+              <div class="display">Built for the work behind the win.</div>
+              <div class="body" style="max-width:44ch">Training, recruiting tools, and team management for athletes, coaches, and camps.</div>
+              <div class="cluster"><div class="btn">Request demo</div><div class="btn text">See plans</div></div>
+            </div>
+            <div class="media" style="height:320px">product visual: phone with session summary</div>
+          </div>
+          <div class="grid-3">
+            <div class="card"><div class="media" style="height:140px">app screenshot</div><div class="title" style="font-size:16px">For athletes</div><div class="lines"><div class="bar" style="width:90%"></div><div class="bar" style="width:60%"></div></div></div>
+            <div class="card"><div class="media" style="height:140px">roster screenshot</div><div class="title" style="font-size:16px">For coaches</div><div class="lines"><div class="bar" style="width:85%"></div><div class="bar" style="width:55%"></div></div></div>
+            <div class="card"><div class="media" style="height:140px">camp dashboard</div><div class="title" style="font-size:16px">For camps</div><div class="lines"><div class="bar" style="width:80%"></div><div class="bar" style="width:65%"></div></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <aside class="designer-note">
+      <strong>Designer note</strong>
+      The visual is a placeholder to show placement only.
+    </aside>
+  </div>
+</section>
+
+</body>
+</html>
