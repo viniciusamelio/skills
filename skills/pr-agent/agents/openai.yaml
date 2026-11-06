@@ -1,0 +1,3 @@
+interface:
+  display_name: "PR Agent"
+  short_description: "Describe, review and improve pull requests"
