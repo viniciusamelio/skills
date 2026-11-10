@@ -1,7 +1,9 @@
 #!/usr/bin/env node
 // Checks that every skill in skills/ is installable by every route:
 // valid frontmatter, Codex metadata, an entry in the plugin manifest, and a
-// README entry. Exits 1 and lists the problems when any check fails.
+// README entry. Also checks that every rule in rules/ is a kebab-case Markdown
+// file with a title and a README entry. Exits 1 and lists the problems when
+// any check fails.
 
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
@@ -50,8 +52,20 @@ for (const name of skills) {
   if (!readme.includes(`(./skills/${name}/SKILL.md)`)) problems.push(`${name}: not linked from README.md`);
 }
 
+const rulesDir = join(repo, "rules");
+const rules = existsSync(rulesDir)
+  ? readdirSync(rulesDir).filter((file) => file.endsWith(".md")).map((file) => file.slice(0, -3)).sort()
+  : [];
+for (const name of rules) {
+  if (!/^[a-z0-9]+(-[a-z0-9]+)*$/.test(name)) problems.push(`rules/${name}.md: name must be lowercase kebab-case`);
+  const source = readFileSync(join(rulesDir, `${name}.md`), "utf8");
+  // Rules carry no frontmatter so that every harness can load them as plain instructions.
+  if (!/^# \S/.test(source)) problems.push(`rules/${name}.md: must start with a "# " title and no frontmatter`);
+  if (!readme.includes(`(./rules/${name}.md)`)) problems.push(`rules/${name}.md: not linked from README.md`);
+}
+
 if (problems.length > 0) {
   console.error(problems.map((problem) => `- ${problem}`).join("\n"));
   process.exit(1);
 }
-console.log(`${skills.length} skills OK`);
+console.log(`${skills.length} skills and ${rules.length} rule${rules.length === 1 ? "" : "s"} OK`);

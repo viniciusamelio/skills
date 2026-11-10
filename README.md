@@ -1,6 +1,6 @@
 # Skills
 
-My agent skills. Each one is a folder under `skills/` with a `SKILL.md`, following the [Agent Skills](https://agentskills.io) format, so any agent that reads that format can use them.
+My agent skills and rules. Each skill is a folder under `skills/` with a `SKILL.md`, following the [Agent Skills](https://agentskills.io) format, so any agent that reads that format can use them. Each rule is a plain Markdown file under `rules/`: always-on instructions that any agent can load. Rules aren't part of the plugin installs below; see [Rules](#rules) for how to install them.
 
 ## Installation
 
@@ -55,11 +55,12 @@ cd skills
 scripts/link-skills.sh
 ```
 
-This symlinks every skill into `~/.agents/skills` (Codex, Gemini CLI, OpenCode and other Agent Skills harnesses) and into the skill directory of each harness found on the machine: `~/.claude/skills`, `~/.cursor/skills`, `~/.copilot/skills`. Edits in the repo take effect right away, and `git pull` keeps them current. Re-run it after adding, removing, or renaming a skill.
+This symlinks every skill into `~/.agents/skills` (Codex, Gemini CLI, OpenCode and other Agent Skills harnesses) and into the skill directory of each harness found on the machine: `~/.claude/skills`, `~/.cursor/skills`, `~/.copilot/skills`. It also symlinks every rule into `~/.claude/rules` when Claude Code is installed. Edits in the repo take effect right away, and `git pull` keeps them current. Re-run it after adding, removing, or renaming a skill or rule.
 
 - `scripts/link-skills.sh --dry-run` prints what would change.
 - `scripts/link-skills.sh --unlink` removes every link into this repo.
-- `SKILLS_DESTS=dir1:dir2 scripts/link-skills.sh` links into the given directories instead.
+- `SKILLS_DESTS=dir1:dir2 scripts/link-skills.sh` links skills into the given directories instead, and links no rules.
+- `RULES_DESTS=dir1:dir2 scripts/link-skills.sh` links rules into the given directories instead.
 
 Don't combine local links with a plugin install in the same agent.
 
@@ -72,6 +73,23 @@ Don't combine local links with a plugin install in the same agent.
 - **[rfc](./skills/rfc/SKILL.md)**: Draft or revise a PR-scoped RFC, ready for the Issue and pull request descriptions.
 - **[ui-prototype](./skills/ui-prototype/SKILL.md)**: Prototype the front end of a flow as a grayscale mid-fi, then, after approval, refine it into a hi-fi with handoff documentation, in a connected prototyping app or a self-contained HTML file.
 
+## Rules
+
+- **[code-comments](./rules/code-comments.md)**: Comment why, not what, following *The Pragmatic Programmer*: no comments that restate the code, no comment required on every block or test phase.
+
+Rules are plain Markdown with no frontmatter, so every agent reads them as ordinary instructions. Each agent loads always-on instructions from a different place:
+
+| Agent | Global (all projects) | Per project |
+| --- | --- | --- |
+| Claude Code | `scripts/link-skills.sh` links them into `~/.claude/rules/` | Copy into `.claude/rules/` |
+| Codex | Paste into `~/.codex/AGENTS.md` | Paste into `AGENTS.md` |
+| Gemini CLI | Paste into `~/.gemini/GEMINI.md` | Paste into `GEMINI.md` |
+| Cursor | Paste into **Settings > Rules > User Rules** | Copy into `.cursor/rules/<name>.mdc` |
+| GitHub Copilot | Paste into your personal custom instructions | Copy into `.github/instructions/<name>.instructions.md` with `applyTo: "**"` frontmatter |
+| Others | The agent's global instructions file | `AGENTS.md` |
+
+Pasted copies don't update with the repo; re-copy after pulling changes.
+
 ## Adding a skill
 
 1. Create `skills/<name>/SKILL.md` with `name` (matching the folder) and `description` in the frontmatter.
@@ -80,6 +98,12 @@ Don't combine local links with a plugin install in the same agent.
 4. List the skill in this README.
 5. Run `npm run check` and `claude plugin validate .`, then `scripts/link-skills.sh`.
 6. Run `npx changeset` to describe the change.
+
+## Adding a rule
+
+1. Create `rules/<name>.md`, in kebab-case, starting with a `# ` title and no frontmatter.
+2. List the rule in the [Rules](#rules) section of this README.
+3. Run `npm run check`, then `scripts/link-skills.sh`.
 
 ## Releasing
 

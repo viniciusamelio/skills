@@ -2,16 +2,18 @@
 set -euo pipefail
 
 # Links every skill in skills/ into the global skill directories of each agent
-# harness found on this machine. Each entry is a symlink into this repo, so a
-# `git pull` keeps installed skills current. Re-run after adding, removing, or
-# renaming a skill.
+# harness found on this machine, and every rule in rules/ into the harnesses
+# that load a global rules directory. Each entry is a symlink into this repo,
+# so a `git pull` keeps them current. Re-run after adding, removing, or
+# renaming a skill or rule.
 #
 # Usage:
 #   scripts/link-skills.sh            link into the detected directories
 #   scripts/link-skills.sh --unlink   remove every link that points into this repo
 #   scripts/link-skills.sh --dry-run  print what would change
 #
-# Set SKILLS_DESTS to a colon-separated list of directories to override detection.
+# Set SKILLS_DESTS or RULES_DESTS to a colon-separated list of directories to
+# override detection. Setting only SKILLS_DESTS links no rules.
 
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 MODE="link"
@@ -21,7 +23,7 @@ for arg in "$@"; do
   case "$arg" in
     --unlink) MODE="unlink" ;;
     --dry-run) DRY_RUN=1 ;;
-    -h|--help) sed -n '4,15p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
+    -h|--help) sed -n '4,17p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
     *) echo "error: unknown option $arg" >&2; exit 2 ;;
   esac
 done
@@ -57,6 +59,17 @@ else
   done
 fi
 
+# Claude Code loads every Markdown file in ~/.claude/rules. The other harnesses
+# read a single global instructions file instead, which README.md covers.
+if [ -n "${RULES_DESTS:-}" ]; then
+  IFS=':' read -r -a RULE_DESTS <<< "$RULES_DESTS"
+elif [ -n "${SKILLS_DESTS:-}" ]; then
+  RULE_DESTS=()
+else
+  RULE_DESTS=()
+  [ -d "$HOME/.claude" ] && RULE_DESTS+=("$HOME/.claude/rules")
+fi
+
 points_into_repo() {
   local target
   target="$(readlink "$1")"
@@ -77,21 +90,26 @@ clean() {
   done
 }
 
-names=()
-srcs=()
+skill_names=()
+skill_srcs=()
 while IFS= read -r -d '' skill_md; do
   src="$(dirname "$skill_md")"
-  names+=("$(basename "$src")")
-  srcs+=("$src")
+  skill_names+=("$(basename "$src")")
+  skill_srcs+=("$src")
 done < <(find "$REPO/skills" -mindepth 2 -maxdepth 2 -name SKILL.md -print0 | sort -z)
 
-for dest in "${DESTS[@]}" "${LEGACY_DESTS[@]}"; do
-  clean "$dest"
-done
+rule_names=()
+rule_srcs=()
+if [ -d "$REPO/rules" ]; then
+  while IFS= read -r -d '' rule; do
+    rule_names+=("$(basename "$rule")")
+    rule_srcs+=("$rule")
+  done < <(find "$REPO/rules" -mindepth 1 -maxdepth 1 -name '*.md' -print0 | sort -z)
+fi
 
-[ "$MODE" = "unlink" ] && exit 0
-
-for dest in "${DESTS[@]}"; do
+# Bash 3.2 (macOS) has no namerefs, so callers set names/srcs before calling.
+link_into() {
+  local dest="$1" i target
   # A destination that is itself a link into this repo would make us write
   # links back into the working copy.
   if [ -L "$dest" ] && points_into_repo "$dest"; then
@@ -103,7 +121,7 @@ for dest in "${DESTS[@]}"; do
   for i in "${!names[@]}"; do
     target="$dest/${names[$i]}"
     if [ -e "$target" ] && [ ! -L "$target" ]; then
-      echo "skip $target: a real directory exists there (installed by another tool?)" >&2
+      echo "skip $target: a real file or directory exists there (installed by another tool?)" >&2
       continue
     fi
     if [ -L "$target" ] && ! points_into_repo "$target"; then
@@ -113,4 +131,22 @@ for dest in "${DESTS[@]}"; do
     run ln -sfn "${srcs[$i]}" "$target"
     say "linked ${names[$i]} -> $dest"
   done
+}
+
+for dest in "${DESTS[@]}" "${LEGACY_DESTS[@]}" ${RULE_DESTS[@]+"${RULE_DESTS[@]}"}; do
+  clean "$dest"
+done
+
+[ "$MODE" = "unlink" ] && exit 0
+
+names=(${skill_names[@]+"${skill_names[@]}"})
+srcs=(${skill_srcs[@]+"${skill_srcs[@]}"})
+for dest in "${DESTS[@]}"; do
+  link_into "$dest"
+done
+
+names=(${rule_names[@]+"${rule_names[@]}"})
+srcs=(${rule_srcs[@]+"${rule_srcs[@]}"})
+for dest in ${RULE_DESTS[@]+"${RULE_DESTS[@]}"}; do
+  link_into "$dest"
 done
