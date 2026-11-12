@@ -1,4 +1,4 @@
-# Custom skills
+# Custom skills and rules
 
 Keep all skill instructions, metadata, and supporting resources in English.
 Store each skill in its own directory under `skills/`, with a `SKILL.md` entrypoint whose frontmatter `name` matches the directory.
@@ -12,3 +12,9 @@ Every skill must be installable by every route described in `README.md`:
 - `README.md` links every skill to its `SKILL.md`.
 
 After adding, removing, or renaming a skill, run `npm run check`, `claude plugin validate .`, and `scripts/link-skills.sh`.
+
+## Rules
+
+Store each rule as `rules/<name>.md`, in English and kebab-case, starting with a `# ` title and no frontmatter, so every agent can load it as plain instructions. Keep rules agent-agnostic like skills. List every rule in the Rules section of `README.md`. Rules don't ship in the plugin, so they need no changeset.
+
+After adding, removing, or renaming a rule, run `npm run check` and `scripts/link-skills.sh`.
