@@ -68,6 +68,7 @@ Don't combine local links with a plugin install in the same agent.
 
 - **[kaizen](./skills/kaizen/SKILL.md)**: Identify, propose, or implement small continuous improvements using mistake prevention, YAGNI, explicit error values, and incremental refactoring.
 - **[modular-thinking](./skills/modular-thinking/SKILL.md)**: Analyze a feature or the whole project through DDD bounded contexts and vertical slices, recommend where new work belongs, or run a test-protected migration toward that structure.
+- **[my-voice](./skills/my-voice/SKILL.md)**: Write in your own voice: `setup` saves samples of your formal or informal writing in `~/.agents/my-voice/`, and `express` drafts a text from them, waits for your approval, and delivers it to Slack, email, a PR, or an issue.
 - **[pr-agent](./skills/pr-agent/SKILL.md)**: Describe, review, improve, or answer questions about a pull request or local diff using PR-Agent's methods, with code suggestions scored in a second pass that drops weak ones, and optional publishing to the PR.
 - **[pr-runtime-evidence](./skills/pr-runtime-evidence/SKILL.md)**: Investigate stored crashes and logs related to code planned for or changed in a PR, connecting them to scoped prevention and regression coverage.
 - **[rfc](./skills/rfc/SKILL.md)**: Draft or revise a PR-scoped RFC, ready for the Issue and pull request descriptions.
