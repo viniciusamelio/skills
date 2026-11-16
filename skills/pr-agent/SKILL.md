@@ -35,6 +35,7 @@ Large PRs need no chunking: inspect file by file, prioritize files with logic ov
 ## Rules for every tool
 
 - **New code only.** Judge the lines the PR adds or changes and the issues it introduces. Pre-existing problems are out of scope unless the PR makes them worse or the user asks.
+- **Names in new code.** When the PR adds generic, misleading, or inconsistent names (`data`, `_state`, `manager`), apply the `semantic-software-vocabulary` skill and suggest a concrete replacement from the project's vocabulary. Treat it as a low-severity maintainability point, not a bug.
 - **Verify instead of guessing.** PR-Agent warns its model that it sees only diff hunks. You can look: before claiming that something is missing, undefined, duplicated, or unused, search the repository. Do not invent identifiers, signatures, or import paths; confirm that each one you use exists.
 - **Concrete over speculative.** Report a problem only with a realistic trigger scenario. For clear bugs and security issues, be thorough even when the trigger is narrow. For lower-severity concerns, be certain or stay silent. When impact is high but confidence is limited, report it and state what remains uncertain.
 - **Accurate severity, plain tone.** Say upfront when an issue needs specific inputs or environments. No praise, filler, or accusatory language. Quote code elements in backticks.

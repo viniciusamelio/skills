@@ -72,11 +72,13 @@ Don't combine local links with a plugin install in the same agent.
 - **[pr-agent](./skills/pr-agent/SKILL.md)**: Describe, review, improve, or answer questions about a pull request or local diff using PR-Agent's methods, with code suggestions scored in a second pass that drops weak ones, and optional publishing to the PR.
 - **[pr-runtime-evidence](./skills/pr-runtime-evidence/SKILL.md)**: Investigate stored crashes and logs related to code planned for or changed in a PR, connecting them to scoped prevention and regression coverage.
 - **[rfc](./skills/rfc/SKILL.md)**: Draft or revise a PR-scoped RFC, ready for the Issue and pull request descriptions.
+- **[semantic-software-vocabulary](./skills/semantic-software-vocabulary/SKILL.md)**: Name code elements with precise, intention-revealing words from the project's domain, replacing generic names like `_state`, `data`, or `manager`.
 - **[ui-prototype](./skills/ui-prototype/SKILL.md)**: Prototype the front end of a flow as a grayscale mid-fi, then, after approval, refine it into a hi-fi with handoff documentation, in a connected prototyping app or a self-contained HTML file.
 
 ## Rules
 
 - **[code-comments](./rules/code-comments.md)**: Comment why, not what, following *The Pragmatic Programmer*: no comments that restate the code, no comment required on every block or test phase.
+- **[semantic-software-vocabulary](./rules/semantic-software-vocabulary.md)**: Name code elements by role and domain concept, not generic words like `_state` or `data`; the always-on version of the skill of the same name.
 
 Rules are plain Markdown with no frontmatter, so every agent reads them as ordinary instructions. Each agent loads always-on instructions from a different place:
 

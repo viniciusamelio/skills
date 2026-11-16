@@ -38,7 +38,7 @@ Look for where the language and the rules change, not for technical layers or da
 - **Business capabilities and journeys**: routes, screens, jobs, and integrations grouped by what the business does.
 - **People**: code owners, team structure, and the vocabulary in issues and documentation. Boundaries often follow human communication.
 
-Keep each context internally consistent: one meaning per term inside it. Allow different contexts to model the same concept differently, and translate between them only where they actually exchange information. Do not force a single enterprise-wide model, and do not treat a context as a deployable service: in a monolith a context is a module, package, or namespace. Recommend separate deployables only when the user asks.
+Keep each context internally consistent: one meaning per term inside it, and name its modules, slices, and types with that term by invoking the `semantic-software-vocabulary` skill. Allow different contexts to model the same concept differently, and translate between them only where they actually exchange information. Do not force a single enterprise-wide model, and do not treat a context as a deployable service: in a monolith a context is a module, package, or namespace. Recommend separate deployables only when the user asks.
 
 Model only as much as the problem needs. DDD pays off where domain complexity is the main challenge; for thin CRUD or mostly technical code, say so and keep the structure simple. When the boundary is uncertain, present two or three candidate splits, test them against concrete scenarios from the code, and recommend one with its tradeoffs. Mark inferred contexts as hypotheses the user or domain experts should confirm.
 

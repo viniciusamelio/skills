@@ -1,0 +1,3 @@
+interface:
+  display_name: "Semantic Software Vocabulary"
+  short_description: "Intention-revealing names for code elements"

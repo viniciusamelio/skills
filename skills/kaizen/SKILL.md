@@ -17,6 +17,7 @@ Prefer improvements with demonstrated impact, a small affected surface, easy ver
 
 ## Follow the project's established practices
 
+- When you introduce or change names, invoke the `semantic-software-vocabulary` skill so they reveal intent in the domain's words, and let the project's established vocabulary win over a generic or personal choice.
 - Reuse existing naming, module boundaries, libraries, formatting, error contracts, and testing practices. Cite a representative file or configuration when recommending alignment.
 - Infer conventions from relevant maintained code and explicit configuration, rather than treating an isolated legacy example as the standard. If patterns conflict, choose the closest applicable maintained pattern and explain the choice; ask only when the ambiguity materially affects the delivery.
 - Favor changes that make contributions fit together and reduce the number of patterns contributors must learn. Do not introduce a parallel abstraction or library merely because it is personally preferred.
