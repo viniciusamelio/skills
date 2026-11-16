@@ -1,5 +1,17 @@
 # viniciusamelio-skills
 
+## 0.5.0
+
+### Minor Changes
+
+- [#7](https://github.com/viniciusamelio/skills/pull/7) [`ea27fd7`](https://github.com/viniciusamelio/skills/commit/ea27fd7facf37d2667f30adf47dcd5e0a5b59104) Thanks [@viniciusamelio](https://github.com/viniciusamelio)! - Add `my-voice`, a skill that writes in the user's own voice. `setup` chooses a formal or an informal tone, collects samples of the user's messages and speech, and saves them with a derived style profile in `~/.agents/my-voice/`, where every agent on the machine can read them. `express` drafts a text from those samples, waits for the user's approval, and then delivers it to the target: a Slack message, an email, a PR comment, a GitHub issue, or similar.
+
+- [#9](https://github.com/viniciusamelio/skills/pull/9) [`2660bca`](https://github.com/viniciusamelio/skills/commit/2660bcad7155a841b451d40440f47be5db426227) Thanks [@viniciusamelio](https://github.com/viniciusamelio)! - Add `semantic-software-vocabulary`, a skill with naming conventions for code elements. It replaces generic or inconsistent names (`_state`, `data`, `manager`) with precise, intention-revealing words from the project's domain, per kind of element, while respecting the language's and the project's conventions.
+
+### Patch Changes
+
+- [#9](https://github.com/viniciusamelio/skills/pull/9) [`2660bca`](https://github.com/viniciusamelio/skills/commit/2660bcad7155a841b451d40440f47be5db426227) Thanks [@viniciusamelio](https://github.com/viniciusamelio)! - `kaizen`, `pr-agent`, and `modular-thinking` now point to the `semantic-software-vocabulary` skill when they introduce, review, or define names in code.
+
 ## 0.4.0
 
 ### Minor Changes
