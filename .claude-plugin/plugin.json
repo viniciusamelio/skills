@@ -15,6 +15,7 @@
     "./skills/pr-agent",
     "./skills/pr-runtime-evidence",
     "./skills/rfc",
+    "./skills/semantic-software-vocabulary",
     "./skills/ui-prototype"
   ]
 }
