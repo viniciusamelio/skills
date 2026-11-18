@@ -1,5 +1,11 @@
 # viniciusamelio-skills
 
+## 0.5.1
+
+### Patch Changes
+
+- [#10](https://github.com/viniciusamelio/skills/pull/10) [`3fac870`](https://github.com/viniciusamelio/skills/commit/3fac870ab87bd337658c92303807266be633b0fb) Thanks [@viniciusamelio](https://github.com/viniciusamelio)! - Rework the modular-thinking plan review page so it leads with the decisions the reviewer must make, shows one short row per change, and moves evidence into a collapsed appendix.
+
 ## 0.5.0
 
 ### Minor Changes
