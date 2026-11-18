@@ -60,7 +60,7 @@ Find the context whose language matches the feature. If none fits, say whether t
 
 ## Present the plan visually before confirmation
 
-Before asking the user to confirm a plan, render it as a temporary HTML page following [references/plan-presentation.md](references/plan-presentation.md) and its template. The page shows the current and target context maps, every file and folder to add, change, move, or remove, the request flow, the ordered steps, and the test plan, in clean diagrams that cover everything the plan does. Each change states its reason plainly, with internal sources (files, tests, history, what the user said) and external sources (the principles below). The page is a static, self-contained document that reads on any screen and with scripts disabled, so the user can attach it to an issue or pull request: pre-render its diagrams with the skill's `scripts/render-diagrams.mjs`. Do not edit code until the user confirms, in the conversation or where they shared the page, and regenerate the page when the plan changes.
+Before asking the user to confirm a plan, render it as a temporary HTML page following [references/plan-presentation.md](references/plan-presentation.md) and its template. The page leads with what the reviewer must decide, then shows the target context map, the files to add, change, move, or remove, one short row per change with its reason, guard test, and risk, and the ordered steps. Evidence, the full test plan, unchanged parts, follow-ups, and hypotheses sit in a collapsed appendix, so the review covers the points that matter and does not drown in detail. A change without a plain reason does not belong in the plan. The page is a static, self-contained document that reads on any screen and with scripts disabled, so the user can attach it to an issue or pull request: pre-render its diagrams with the skill's `scripts/render-diagrams.mjs`. Do not edit code until the user confirms, in the conversation or where they shared the page, and regenerate the page when the plan changes.
 
 ## Migrate with tests as the safety net
 
@@ -78,7 +78,7 @@ If the user asks for the plan only, deliver the steps above as the visual propos
 
 ## Report
 
-Deliver the visual page whenever a plan awaits confirmation or recommendations include structural changes, plus a short chat summary with its absolute path. For Assess and Place new work, cover:
+Deliver the visual page whenever a plan awaits confirmation or recommendations include structural changes, plus a short chat summary with its absolute path. Keep the chat summary to the decisions the user must make; the page holds the rest. For Assess and Place new work, cover:
 
 - **Current state**: architectural style, existing boundaries, and test coverage, with cited files.
 - **Context map**: each context with its key terms and their meaning there, the slices it owns, and its relationships with the pattern used, as a list or a small diagram.
