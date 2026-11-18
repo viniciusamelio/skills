@@ -2,6 +2,8 @@
 
 Before asking the user to confirm a plan, render it as a temporary HTML page so the user can review what will be created, changed, moved, or removed, and why, without reading the whole chat.
 
+The page serves a reviewer who has a few minutes. It leads with what the reviewer must decide, shows the shape of the change, and keeps everything that only backs the plan up out of the way. A page that lists every fact it knows fails that reviewer: the important points drown, and the review turns into reading.
+
 ## When
 
 - Always before confirmation in **Migrate**, and in **Place new work** when the user will confirm a plan before you build.
@@ -26,56 +28,73 @@ The page is a static document that the user may attach to an issue or a pull req
 - Keep the template's responsive rules: long words, paths, and code wrap; tables and diagrams scroll inside their panels instead of widening the page. Do not add fixed widths.
 - Do not add controls that only work in one browser, such as approval buttons, notes, or state saved in the browser. Reviewers answer where the page is shared.
 
-## What the page must contain
+## What the page contains
 
-1. **Summary**: one paragraph with what changes, why, and what stays the same.
-2. **Context map, current and target** side by side. Show every context the plan touches, its key terms, and each relationship labeled with its context-mapping pattern and direction.
-3. **Structure**: a file tree of every folder and file the plan adds, changes, moves, or removes, colored by kind, with moves shown as `old → new`. Group unchanged siblings into one line instead of omitting them silently.
-4. **Flow**: how a representative request crosses slices and contexts after the change, including contracts and translation layers.
-5. **Steps**: every increment in order, with the tests that guard each one and the point where transitional code is removed.
-6. **One card per change** with:
-   - **What**: the change, in concrete terms.
-   - **Why**: the problem it solves and the benefit, stated plainly. A change without a clear reason does not belong in the plan.
-   - **Internal sources**: evidence from the repository, such as `path:line` references, tests, configuration, git history (co-changes, commits), documentation, or what the user said.
-   - **External sources**: the principle that justifies it, linked to the skill's sources (Fowler, Evans, Bogard, and the others listed in `SKILL.md`), with the specific idea that applies.
-   - **Tests**: baseline, characterization, migrated, or test-first tests for this change.
-   - **Risk**: what could break and how to roll back.
-7. **Test plan** table: every test to run, create, migrate, or write test-first, with the behavior it protects and its step.
-8. **What stays unchanged** and why, so the user can see the plan respects the current architecture.
-9. **Optional follow-ups** outside this plan.
-10. **Open questions and hypotheses**, marked as such.
+The order is the point: each section answers a question the reviewer has after the one before it. The sections run from "what must I decide" to "what backs this up".
 
-Separate verified facts from inferences everywhere: an inferred context or boundary is labeled as a hypothesis, with the evidence behind it.
+1. **Summary**: at most three sentences. What changes, why it matters now, what stays the same. Add the counts that fit the plan (files moved, files added, behavior changes, steps) and only counts the plan really has.
+2. **Decide**: the questions the reviewer must answer before work starts, three at most. Each one has the options, the recommended one first and marked, a few words on why each option wins or loses, and one sentence with the recommendation and what would change it. If there is nothing to decide, say "no open decisions" in the summary and drop the section.
+3. **Shape**: the target, not the history.
+   - One context-map diagram of the target, nodes marked by change kind and edges labeled with their context-mapping pattern.
+   - The file tree of what the plan adds, changes, moves, or removes, with untouched siblings grouped in one line.
+   - A "before" diagram only when the target cannot be read without it. A request-flow diagram only when a request crosses contexts through a contract the plan introduces.
+4. **Changes**: one short row each, in the order the work happens.
+   - What changes, in the title.
+   - Why, in one sentence that names the problem it solves. A change without a reason does not belong in the plan.
+   - The test that guards it, and the risk as low, medium, or high.
+   - An evidence disclosure (`path:line`, history, rollback) only where the change is contested, medium or high risk, or not obvious from the diff. Do not attach one to every row.
+   - With more than about twelve changes, group them by slice or context and write one row per group.
+5. **Steps**: every increment in order, each shippable, each with its guard tests, and the point where transitional code goes away.
+6. **Appendix**, collapsed so skipping it costs nothing. Only the blocks that have content:
+   - Sources: the repository evidence behind the plan and the external principles, each principle named once for the whole plan, not repeated per change.
+   - Test plan: every test to run, create, migrate, or write test-first, with the behavior it protects and its step.
+   - What stays unchanged, and why.
+   - Optional follow-ups that this plan does not include.
+   - Hypotheses and the evidence behind each.
+
+Separate verified facts from inferences everywhere: an inferred context or boundary is labeled as a hypothesis. A hypothesis whose answer changes the plan is a decision and belongs in **Decide**, not in the appendix.
+
+## Keep it short
+
+Check each of these before you write the page:
+
+- **Lead with the decision.** A reader who stops after the first screen knows what the plan does, what it costs, and what they must answer.
+- **Say a thing once.** A reason lives in one place: the change row, or the decision. A principle lives in the appendix. If two sections say the same thing, cut one.
+- **Cut what does not move the decision.** Do not list files that are only moved without a reason, tests that already exist and are not touched, or sources that nobody will open. When unsure whether the reviewer needs a fact, put it in the appendix.
+- **One sentence per reason.** If a reason needs a paragraph, it is a decision or an open question, so promote it.
+- **Numbers come from the plan.** Never invent a count, a score, or a metric to make the summary look measured.
+- **Empty sections are deleted.** A section with filler is worse than no section.
 
 ## Visual language
 
 The template follows a monochrome interface: hierarchy comes from stepped surface tones, type weight, and size, inside hairline panels with nearly square corners (2 to 4px). Each panel has a header with its label and an interaction hint, and a dashed footer with the caption and live metadata. Keep it that way.
 
 - **Surfaces**: the page background is the darkest (or lightest) tone; sections sit on `surface-1`, content inside them on `surface-2`, and emphasis on `surface-3` and `surface-4`. Separate elements by tone and spacing, not by borders.
-- **Type**: large, tight display headings for sections; small uppercase labels for metadata; body text in a muted tone, with the most important sentence (the reason for a change) in the brightest tone.
+- **Type**: large, tight display headings for sections; small uppercase labels for metadata; body text in a muted tone, with the most important sentence (the recommendation, the reason for a change) in the brightest tone.
 - **Change kinds** are told apart by tone, line style, and a glyph, so they stay readable without color:
   - add `+`: solid fill in the foreground tone, like a primary button
   - change `~`: raised surface with a light border
   - move `→`: dashed border
   - remove `−`: dotted border, faded and struck through
   - keep `·`: lowest surface, muted text
-- **Labels and interaction state** are the one accent: blue, uppercase monospace with wide tracking, wrapped in brackets (`[ HYPOTHESIS ]`). Use the template's label classes (`eyebrow`, `kicker`, table headers, `hypothesis`) for every label, such as section kickers, source and risk headings, and hypotheses. The CSS adds the brackets; write only the word.
+- **The recommended option** carries the filled marker and the raised surface; rejected options stay muted. **High risk** is the one filled label among the rows.
+- **Labels and interaction state** are the one accent: blue, uppercase monospace with wide tracking, wrapped in brackets (`[ HYPOTHESIS ]`). Use the template's label classes (`eyebrow`, `kicker`, table headers, `hypothesis`) for every label, such as section kickers and hypotheses. The CSS adds the brackets; write only the word.
 - The accent also marks interaction state: traced elements, the active filter, and focus. Do not use it anywhere else, and do not add other colors, gradients, shadows, or fonts.
 
 ## Extras
 
 When scripts run, the template adds these extras; the page only needs consistent markup:
 
-- **Tracing**: hovering a diagram node, a file row, or a change card highlights everything that shares one of its ref tokens and dims the rest. A Mermaid node's token is its id (`B` in `B["Billing"]`). Give each change card and file row a `data-refs` attribute listing the node ids and any extra tokens that connect them, so every change is reachable from its diagram nodes and files. Clicking a node or a row opens the first change card that shares a token.
-- **Filter**: the legend chips filter every diagram, row, and card by change kind.
+- **Tracing**: hovering a diagram node, a file row, or a change row highlights everything that shares one of its ref tokens and dims the rest. A Mermaid node's token is its id (`B` in `B["Billing"]`). Give each change row and file row a `data-refs` attribute listing the node ids and any extra tokens that connect them, so every change is reachable from its diagram nodes and files. Clicking a node or a row opens the first change row that shares a token.
+- **Filter**: the legend chips filter every diagram, row, and change by change kind.
 - **Navigation**: a contents list with scroll tracking, expandable diagram panels, click-to-copy on code and paths, and `j`/`k`/`Esc` shortcuts.
 - Translate the strings in the `ui-text` block with the rest of the page.
 
 ## Diagrams
 
 - Prefer clean diagrams: rounded nodes, short labels, few node shapes, and left-to-right or top-to-bottom flow without crossing edges where possible. Use top-to-bottom for sequences of more than four steps.
-- Keep every diagram within 960px of natural width, so it fits a narrow screen at a legible size; the render script warns past that. Node labels are names, not sentences (about 24 characters; details go in the change cards), and edge labels are a pattern name or a short verb. Siblings line up across the flow: in `flowchart TB` they form a row, in `flowchart LR` a column, so pick the direction that stacks the larger group and keep the other direction to about four nodes. Keep sequence diagrams to about five participants. When a diagram still does not fit, split it.
+- Keep every diagram within 960px of natural width, so it fits a narrow screen at a legible size; the render script warns past that. Node labels are names, not sentences (about 24 characters; details go in the change rows), and edge labels are a pattern name or a short verb. Siblings line up across the flow: in `flowchart TB` they form a row, in `flowchart LR` a column, so pick the direction that stacks the larger group and keep the other direction to about four nodes. Keep sequence diagrams to about five participants. When a diagram still does not fit, split it by context.
 - Mark Mermaid nodes with `:::add`, `:::change`, `:::move`, `:::remove`, or `:::keep`. The page styles these classes; do not add `classDef` or `style` lines, or colors of any kind.
-- Cover everything the plan does. Every context, slice, moved group of files, contract, and step must appear in at least one diagram. When a diagram gets crowded, split it, for example one diagram per context, instead of dropping detail.
-- Use `flowchart` for context maps and steps, and `sequenceDiagram` for request flow. Quote labels that contain punctuation (`A["Billing: Invoice"]`). Keep each diagram's source readable, because it is the fallback when Mermaid cannot load.
+- Show every context, slice, and contract the plan touches in some diagram or in the file tree, and leave untouched parts out or group them in one `:::keep` node.
+- Use `flowchart` for context maps and `sequenceDiagram` for request flow. Quote labels that contain punctuation (`A["Billing: Invoice"]`). Keep each diagram's source readable, because it is the fallback when Mermaid cannot load.
 - Give each diagram a caption that says what to look at.
